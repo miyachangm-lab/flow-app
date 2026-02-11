@@ -16,6 +16,7 @@
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;900&family=Inter:wght@400;600;700;800;900&display=swap"
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <meta name="theme-color" content="#0f172a">
@@ -337,6 +338,60 @@
         .preview-item:last-child { border-bottom: none; }
         .preview-label { font-size: 12px; color: var(--gray-400); }
         .preview-value { font-size: 13px; color: white; font-weight: 600; }
+
+        /* Dashboard Styles */
+        .dashboard-container { padding: 16px; }
+        .dashboard-header { margin-bottom: 16px; }
+        .dashboard-period-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .period-tab {
+            flex: 1; padding: 10px; text-align: center; border-radius: 8px;
+            background: var(--navy-light); border: 1.5px solid var(--gray-700);
+            color: var(--gray-400); font-size: 12px; font-weight: 600; cursor: pointer;
+        }
+        .period-tab.active { background: var(--teal-dim); border-color: var(--teal); color: var(--teal-light); }
+
+        .summary-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+        .summary-card {
+            background: var(--navy-light); border-radius: 12px; padding: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .summary-card.highlight {
+            background: linear-gradient(135deg, rgba(13,148,136,0.15) 0%, var(--navy-light) 100%);
+            border-color: rgba(13,148,136,0.3);
+        }
+        .summary-card-label { font-size: 11px; color: var(--gray-400); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-card-value { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 900; color: white; }
+        .summary-card-value.teal { color: var(--teal-light); }
+        .summary-card-sub { font-size: 11px; color: var(--gray-500); margin-top: 4px; }
+        .summary-card-trend { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+        .summary-card-trend.up { background: rgba(34,197,94,0.2); color: #22c55e; }
+        .summary-card-trend.down { background: rgba(239,68,68,0.2); color: #ef4444; }
+
+        .chart-section { background: var(--navy-light); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+        .chart-title { font-size: 14px; font-weight: 700; color: white; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .chart-container { position: relative; height: 200px; }
+        .chart-container.tall { height: 250px; }
+
+        .ranking-section { background: var(--navy-light); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+        .ranking-title { font-size: 14px; font-weight: 700; color: white; margin-bottom: 12px; }
+        .ranking-list { display: flex; flex-direction: column; gap: 8px; }
+        .ranking-item { display: flex; align-items: center; gap: 12px; padding: 10px; background: var(--navy); border-radius: 8px; }
+        .ranking-rank { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 800; color: white; }
+        .ranking-rank.gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+        .ranking-rank.silver { background: linear-gradient(135deg, #94a3b8, #64748b); }
+        .ranking-rank.bronze { background: linear-gradient(135deg, #d97706, #b45309); }
+        .ranking-rank.normal { background: var(--gray-700); }
+        .ranking-info { flex: 1; }
+        .ranking-name { font-size: 13px; font-weight: 600; color: white; }
+        .ranking-detail { font-size: 11px; color: var(--gray-400); }
+        .ranking-value { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; color: var(--teal-light); }
+
+        .breakdown-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .breakdown-item { background: var(--navy); border-radius: 8px; padding: 12px; text-align: center; }
+        .breakdown-icon { font-size: 20px; margin-bottom: 4px; }
+        .breakdown-label { font-size: 10px; color: var(--gray-400); margin-bottom: 4px; }
+        .breakdown-value { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: white; }
+        .breakdown-pct { font-size: 10px; color: var(--gray-500); }
     </style>
 </head>
 
@@ -354,7 +409,8 @@
     <div class="tab-bar">
         <div class="tab active" data-tab="events"><span class="tab-icon">📅</span>イベント</div>
         <div class="tab" data-tab="apps"><span class="tab-icon">📱</span>アプリ</div>
-        <div class="tab" data-tab="long"><span class="tab-icon">🗺</span>ロング実績</div>
+        <div class="tab" data-tab="long"><span class="tab-icon">🗺</span>ロング</div>
+        <div class="tab" data-tab="dashboard"><span class="tab-icon">📊</span>収益</div>
     </div>
 
     <!-- Events Tab Content -->
@@ -453,6 +509,89 @@
                 <div id="long-map"></div>
                 <div class="map-legend" id="long-legend"></div>
                 <div class="map-stats" id="long-stats"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Tab Content -->
+    <div class="content" id="dashboard-content">
+        <div class="dashboard-container">
+            <!-- Period Tabs -->
+            <div class="dashboard-period-tabs">
+                <div class="period-tab active" data-period="daily">今日</div>
+                <div class="period-tab" data-period="weekly">今週</div>
+                <div class="period-tab" data-period="monthly">今月</div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards" id="summaryCards">
+                <div class="summary-card highlight">
+                    <div class="summary-card-label">売上</div>
+                    <div class="summary-card-value teal" id="totalRevenue">¥0</div>
+                    <div class="summary-card-sub" id="revenueCompare"></div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">乗車回数</div>
+                    <div class="summary-card-value" id="totalRides">0</div>
+                    <div class="summary-card-sub" id="ridesCompare"></div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">平均単価</div>
+                    <div class="summary-card-value" id="avgFare">¥0</div>
+                    <div class="summary-card-sub" id="avgCompare"></div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-label">ロング率</div>
+                    <div class="summary-card-value" id="longRate">0%</div>
+                    <div class="summary-card-sub">¥3,000以上</div>
+                </div>
+            </div>
+
+            <!-- Revenue Chart -->
+            <div class="chart-section">
+                <div class="chart-title">📈 売上推移</div>
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <!-- App Breakdown -->
+            <div class="chart-section">
+                <div class="chart-title">📱 アプリ別内訳</div>
+                <div class="breakdown-grid" id="appBreakdown">
+                    <div class="breakdown-item">
+                        <div class="breakdown-icon">🟢</div>
+                        <div class="breakdown-label">Uber</div>
+                        <div class="breakdown-value" id="uberRevenue">¥0</div>
+                        <div class="breakdown-pct" id="uberPct">0%</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-icon">🟠</div>
+                        <div class="breakdown-label">DiDi</div>
+                        <div class="breakdown-value" id="didiRevenue">¥0</div>
+                        <div class="breakdown-pct" id="didiPct">0%</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-icon">🚕</div>
+                        <div class="breakdown-label">流し</div>
+                        <div class="breakdown-value" id="nagashiRevenue">¥0</div>
+                        <div class="breakdown-pct" id="nagashiPct">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Time Distribution Chart -->
+            <div class="chart-section">
+                <div class="chart-title">⏰ 時間帯別売上</div>
+                <div class="chart-container">
+                    <canvas id="timeChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Area Ranking -->
+            <div class="ranking-section">
+                <div class="ranking-title">🏆 エリア別ランキング</div>
+                <div class="ranking-list" id="areaRanking"></div>
             </div>
         </div>
     </div>
@@ -746,6 +885,8 @@
                 setTimeout(() => { initAppMap(); if (appMap) appMap.invalidateSize(); }, 200);
             } else if (tabName === 'long') {
                 setTimeout(() => { initLongMap(); if (longMap) longMap.invalidateSize(); }, 200);
+            } else if (tabName === 'dashboard') {
+                setTimeout(() => initDashboard(), 100);
             }
         });
     });
@@ -959,6 +1100,181 @@
         btn.addEventListener('click', function() {
             document.querySelectorAll('#long-content .filter-btn[data-fare]').forEach(b => b.classList.remove('active'));
             this.classList.add('active'); longFilters.fare = this.dataset.fare; renderLongMap();
+        });
+    });
+
+    // ========================================
+    // DASHBOARD TAB
+    // ========================================
+    let revenueChart = null, timeChart = null;
+    let dashboardPeriod = 'daily';
+
+    // Sample revenue data (would come from Supabase in production)
+    const REVENUE_DATA = {
+        daily: {
+            labels: ['6時', '9時', '12時', '15時', '18時', '21時', '24時'],
+            data: [1200, 3500, 2800, 1500, 4200, 8500, 5200],
+            rides: [{ app: 'uber', fare: 2400, area: '梅田', time: '7:20' },
+                    { app: 'didi', fare: 1800, area: 'なんば', time: '9:45' },
+                    { app: 'uber', fare: 3200, area: '北新地', time: '12:30' },
+                    { app: 'nagashi', fare: 2100, area: '天王寺', time: '14:20' },
+                    { app: 'uber', fare: 5400, area: '大阪城公園', time: '19:30' },
+                    { app: 'didi', fare: 4800, area: '中之島', time: '21:15' },
+                    { app: 'uber', fare: 7200, area: '北新地', time: '23:40' }]
+        },
+        weekly: {
+            labels: ['月', '火', '水', '木', '金', '土', '日'],
+            data: [18500, 21200, 19800, 22400, 32500, 38200, 28600],
+            rides: [{ app: 'uber', fare: 45200, area: '梅田', count: 18 },
+                    { app: 'didi', fare: 32400, area: 'なんば', count: 14 },
+                    { app: 'uber', fare: 28900, area: '北新地', count: 12 },
+                    { app: 'nagashi', fare: 24800, area: '天王寺', count: 11 },
+                    { app: 'uber', fare: 22100, area: '中之島', count: 9 },
+                    { app: 'didi', fare: 18600, area: 'USJ', count: 8 }]
+        },
+        monthly: {
+            labels: ['第1週', '第2週', '第3週', '第4週'],
+            data: [142000, 168000, 155000, 178000],
+            rides: [{ app: 'uber', fare: 245000, area: '梅田', count: 98 },
+                    { app: 'didi', fare: 182000, area: 'なんば', count: 78 },
+                    { app: 'uber', fare: 156000, area: '北新地', count: 62 },
+                    { app: 'nagashi', fare: 124000, area: '天王寺', count: 55 },
+                    { app: 'uber', fare: 98000, area: '中之島', count: 42 }]
+        }
+    };
+
+    const TIME_DATA = {
+        daily: { labels: ['朝', '昼', '夕', '夜'], data: [4700, 4300, 12700, 5200] },
+        weekly: { labels: ['朝', '昼', '夕', '夜'], data: [28400, 32100, 89200, 31500] },
+        monthly: { labels: ['朝', '昼', '夕', '夜'], data: [124000, 142000, 312000, 165000] }
+    };
+
+    function initDashboard() {
+        renderDashboard();
+    }
+
+    function renderDashboard() {
+        const data = REVENUE_DATA[dashboardPeriod];
+        const timeData = TIME_DATA[dashboardPeriod];
+
+        // Calculate totals
+        const totalRevenue = data.data.reduce((s, v) => s + v, 0);
+        const totalRides = data.rides.length;
+        const avgFare = Math.round(totalRevenue / totalRides);
+        const longRides = data.rides.filter(r => r.fare >= 3000).length;
+        const longRate = Math.round((longRides / totalRides) * 100);
+
+        // App breakdown
+        const uberTotal = data.rides.filter(r => r.app === 'uber').reduce((s, r) => s + r.fare, 0);
+        const didiTotal = data.rides.filter(r => r.app === 'didi').reduce((s, r) => s + r.fare, 0);
+        const nagashiTotal = data.rides.filter(r => r.app === 'nagashi').reduce((s, r) => s + r.fare, 0);
+
+        // Update summary cards
+        document.getElementById('totalRevenue').textContent = `¥${totalRevenue.toLocaleString()}`;
+        document.getElementById('totalRides').textContent = totalRides;
+        document.getElementById('avgFare').textContent = `¥${avgFare.toLocaleString()}`;
+        document.getElementById('longRate').textContent = `${longRate}%`;
+
+        // Comparison text
+        const periodText = dashboardPeriod === 'daily' ? '昨日比' : dashboardPeriod === 'weekly' ? '先週比' : '先月比';
+        document.getElementById('revenueCompare').innerHTML = `${periodText} <span class="summary-card-trend up">+12%</span>`;
+        document.getElementById('ridesCompare').innerHTML = `${periodText} <span class="summary-card-trend up">+3</span>`;
+        document.getElementById('avgCompare').innerHTML = `${periodText} <span class="summary-card-trend up">+8%</span>`;
+
+        // App breakdown
+        document.getElementById('uberRevenue').textContent = `¥${(uberTotal/1000).toFixed(0)}k`;
+        document.getElementById('didiRevenue').textContent = `¥${(didiTotal/1000).toFixed(0)}k`;
+        document.getElementById('nagashiRevenue').textContent = `¥${(nagashiTotal/1000).toFixed(0)}k`;
+        document.getElementById('uberPct').textContent = `${Math.round(uberTotal/totalRevenue*100)}%`;
+        document.getElementById('didiPct').textContent = `${Math.round(didiTotal/totalRevenue*100)}%`;
+        document.getElementById('nagashiPct').textContent = `${Math.round(nagashiTotal/totalRevenue*100)}%`;
+
+        // Revenue Chart
+        if (revenueChart) revenueChart.destroy();
+        const ctx1 = document.getElementById('revenueChart').getContext('2d');
+        revenueChart = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: '売上',
+                    data: data.data,
+                    borderColor: '#14b8a6',
+                    backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#14b8a6'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 }, callback: v => `¥${(v/1000).toFixed(0)}k` } }
+                }
+            }
+        });
+
+        // Time Chart
+        if (timeChart) timeChart.destroy();
+        const ctx2 = document.getElementById('timeChart').getContext('2d');
+        timeChart = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: timeData.labels,
+                datasets: [{
+                    label: '売上',
+                    data: timeData.data,
+                    backgroundColor: ['#f59e0b', '#0ea5e9', '#f97316', '#6366f1'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 11 } } },
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 }, callback: v => `¥${(v/1000).toFixed(0)}k` } }
+                }
+            }
+        });
+
+        // Area Ranking
+        const areaMap = {};
+        data.rides.forEach(r => {
+            if (!areaMap[r.area]) areaMap[r.area] = { total: 0, count: 0 };
+            areaMap[r.area].total += r.fare;
+            areaMap[r.area].count += r.count || 1;
+        });
+        const areaRanking = Object.entries(areaMap)
+            .map(([area, data]) => ({ area, ...data }))
+            .sort((a, b) => b.total - a.total)
+            .slice(0, 5);
+
+        const rankClasses = ['gold', 'silver', 'bronze', 'normal', 'normal'];
+        document.getElementById('areaRanking').innerHTML = areaRanking.map((item, i) => `
+            <div class="ranking-item">
+                <div class="ranking-rank ${rankClasses[i]}">${i + 1}</div>
+                <div class="ranking-info">
+                    <div class="ranking-name">${item.area}</div>
+                    <div class="ranking-detail">${item.count}件</div>
+                </div>
+                <div class="ranking-value">¥${item.total.toLocaleString()}</div>
+            </div>
+        `).join('');
+    }
+
+    // Dashboard period tabs
+    document.querySelectorAll('.period-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            dashboardPeriod = this.dataset.period;
+            renderDashboard();
         });
     });
 
