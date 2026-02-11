@@ -1108,61 +1108,177 @@
     // ========================================
     let revenueChart = null, timeChart = null;
     let dashboardPeriod = 'daily';
+    let TAXI_LOGS = [];
 
-    // Sample revenue data (would come from Supabase in production)
-    const REVENUE_DATA = {
-        daily: {
-            labels: ['6時', '9時', '12時', '15時', '18時', '21時', '24時'],
-            data: [1200, 3500, 2800, 1500, 4200, 8500, 5200],
-            rides: [{ app: 'uber', fare: 2400, area: '梅田', time: '7:20' },
-                    { app: 'didi', fare: 1800, area: 'なんば', time: '9:45' },
-                    { app: 'uber', fare: 3200, area: '北新地', time: '12:30' },
-                    { app: 'nagashi', fare: 2100, area: '天王寺', time: '14:20' },
-                    { app: 'uber', fare: 5400, area: '大阪城公園', time: '19:30' },
-                    { app: 'didi', fare: 4800, area: '中之島', time: '21:15' },
-                    { app: 'uber', fare: 7200, area: '北新地', time: '23:40' }]
-        },
-        weekly: {
-            labels: ['月', '火', '水', '木', '金', '土', '日'],
-            data: [18500, 21200, 19800, 22400, 32500, 38200, 28600],
-            rides: [{ app: 'uber', fare: 45200, area: '梅田', count: 18 },
-                    { app: 'didi', fare: 32400, area: 'なんば', count: 14 },
-                    { app: 'uber', fare: 28900, area: '北新地', count: 12 },
-                    { app: 'nagashi', fare: 24800, area: '天王寺', count: 11 },
-                    { app: 'uber', fare: 22100, area: '中之島', count: 9 },
-                    { app: 'didi', fare: 18600, area: 'USJ', count: 8 }]
-        },
-        monthly: {
-            labels: ['第1週', '第2週', '第3週', '第4週'],
-            data: [142000, 168000, 155000, 178000],
-            rides: [{ app: 'uber', fare: 245000, area: '梅田', count: 98 },
-                    { app: 'didi', fare: 182000, area: 'なんば', count: 78 },
-                    { app: 'uber', fare: 156000, area: '北新地', count: 62 },
-                    { app: 'nagashi', fare: 124000, area: '天王寺', count: 55 },
-                    { app: 'uber', fare: 98000, area: '中之島', count: 42 }]
+    // Sample data (fallback when Supabase is unavailable)
+    const SAMPLE_TAXI_LOGS = [
+        { ride_date: '2026-02-11', ride_time: '07:20', app: 'uber', fare: 2400, area: '梅田' },
+        { ride_date: '2026-02-11', ride_time: '09:45', app: 'didi', fare: 1800, area: 'なんば' },
+        { ride_date: '2026-02-11', ride_time: '12:30', app: 'uber', fare: 3200, area: '北新地' },
+        { ride_date: '2026-02-11', ride_time: '14:20', app: 'nagashi', fare: 2100, area: '天王寺' },
+        { ride_date: '2026-02-11', ride_time: '19:30', app: 'uber', fare: 5400, area: '大阪城公園' },
+        { ride_date: '2026-02-11', ride_time: '21:15', app: 'didi', fare: 4800, area: '中之島' },
+        { ride_date: '2026-02-11', ride_time: '23:40', app: 'uber', fare: 7200, area: '北新地' },
+        { ride_date: '2026-02-10', ride_time: '08:00', app: 'uber', fare: 3100, area: '梅田' },
+        { ride_date: '2026-02-10', ride_time: '11:30', app: 'didi', fare: 2200, area: 'USJ' },
+        { ride_date: '2026-02-10', ride_time: '18:45', app: 'uber', fare: 6200, area: '京セラドーム' },
+        { ride_date: '2026-02-10', ride_time: '22:00', app: 'nagashi', fare: 4500, area: '北新地' },
+        { ride_date: '2026-02-09', ride_time: '07:30', app: 'uber', fare: 2800, area: '新大阪' },
+        { ride_date: '2026-02-09', ride_time: '13:00', app: 'didi', fare: 1900, area: '天王寺' },
+        { ride_date: '2026-02-09', ride_time: '20:30', app: 'uber', fare: 5800, area: '大阪城公園' },
+        { ride_date: '2026-02-08', ride_time: '09:00', app: 'nagashi', fare: 3500, area: '梅田' },
+        { ride_date: '2026-02-08', ride_time: '15:30', app: 'uber', fare: 2600, area: 'なんば' },
+        { ride_date: '2026-02-08', ride_time: '21:00', app: 'didi', fare: 7100, area: '中之島' },
+        { ride_date: '2026-02-07', ride_time: '10:00', app: 'uber', fare: 2200, area: '天王寺' },
+        { ride_date: '2026-02-07', ride_time: '19:00', app: 'uber', fare: 8500, area: '北新地' },
+        { ride_date: '2026-02-06', ride_time: '08:30', app: 'didi', fare: 2900, area: '新大阪' },
+        { ride_date: '2026-02-06', ride_time: '17:00', app: 'nagashi', fare: 4200, area: 'USJ' },
+        { ride_date: '2026-02-05', ride_time: '12:00', app: 'uber', fare: 3300, area: '梅田' },
+        { ride_date: '2026-02-05', ride_time: '20:00', app: 'uber', fare: 6800, area: '京セラドーム' }
+    ];
+
+    // Fetch taxi logs from Supabase (always fetch 30 days)
+    async function fetchTaxiLogs() {
+        if (!sb) return [];
+        try {
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            const monthAgo = new Date(today);
+            monthAgo.setDate(monthAgo.getDate() - 30);
+            const fromDate = monthAgo.toISOString().split('T')[0];
+
+            const { data: logs } = await sb
+                .from('flow_taxi_logs')
+                .select('*')
+                .gte('ride_date', fromDate)
+                .lte('ride_date', todayStr)
+                .order('ride_date', { ascending: false })
+                .order('ride_time', { ascending: false });
+
+            if (logs && logs.length > 0) {
+                console.log(`✅ Loaded ${logs.length} taxi logs from Supabase`);
+                return logs;
+            }
+            return [];
+        } catch (e) {
+            console.warn('fetchTaxiLogs error:', e);
+            return [];
         }
-    };
+    }
 
-    const TIME_DATA = {
-        daily: { labels: ['朝', '昼', '夕', '夜'], data: [4700, 4300, 12700, 5200] },
-        weekly: { labels: ['朝', '昼', '夕', '夜'], data: [28400, 32100, 89200, 31500] },
-        monthly: { labels: ['朝', '昼', '夕', '夜'], data: [124000, 142000, 312000, 165000] }
-    };
+    // Get time period from ride_time
+    function getTimePeriod(time) {
+        if (!time) return 'day';
+        const h = parseInt(time.split(':')[0]);
+        if (h >= 5 && h < 10) return 'morning';
+        if (h >= 10 && h < 17) return 'day';
+        if (h >= 17 && h < 22) return 'evening';
+        return 'night';
+    }
 
-    function initDashboard() {
+    // Process logs for dashboard display
+    function processDashboardData(logs) {
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+
+        let filteredLogs = logs;
+
+        if (dashboardPeriod === 'daily') {
+            filteredLogs = logs.filter(l => l.ride_date === todayStr);
+        } else if (dashboardPeriod === 'weekly') {
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            const weekAgoStr = weekAgo.toISOString().split('T')[0];
+            filteredLogs = logs.filter(l => l.ride_date >= weekAgoStr);
+        }
+        // monthly uses all logs
+
+        // Build chart labels and data
+        let labels = [];
+        let chartData = [];
+
+        if (dashboardPeriod === 'daily') {
+            labels = ['6時', '9時', '12時', '15時', '18時', '21時', '24時'];
+            const hourBuckets = [0, 0, 0, 0, 0, 0, 0];
+            filteredLogs.forEach(l => {
+                const h = parseInt((l.ride_time || '12:00').split(':')[0]);
+                if (h < 9) hourBuckets[0] += l.fare;
+                else if (h < 12) hourBuckets[1] += l.fare;
+                else if (h < 15) hourBuckets[2] += l.fare;
+                else if (h < 18) hourBuckets[3] += l.fare;
+                else if (h < 21) hourBuckets[4] += l.fare;
+                else if (h < 24) hourBuckets[5] += l.fare;
+                else hourBuckets[6] += l.fare;
+            });
+            chartData = hourBuckets;
+        } else if (dashboardPeriod === 'weekly') {
+            labels = ['月', '火', '水', '木', '金', '土', '日'];
+            const dayBuckets = [0, 0, 0, 0, 0, 0, 0];
+            filteredLogs.forEach(l => {
+                const d = new Date(l.ride_date);
+                const dayIndex = (d.getDay() + 6) % 7; // Monday = 0
+                dayBuckets[dayIndex] += l.fare;
+            });
+            chartData = dayBuckets;
+        } else {
+            labels = ['第1週', '第2週', '第3週', '第4週'];
+            const weekBuckets = [0, 0, 0, 0];
+            filteredLogs.forEach(l => {
+                const d = new Date(l.ride_date);
+                const dayOfMonth = d.getDate();
+                const weekIndex = Math.min(3, Math.floor((dayOfMonth - 1) / 7));
+                weekBuckets[weekIndex] += l.fare;
+            });
+            chartData = weekBuckets;
+        }
+
+        // Time period data
+        const timeBuckets = { morning: 0, day: 0, evening: 0, night: 0 };
+        filteredLogs.forEach(l => {
+            const period = getTimePeriod(l.ride_time);
+            timeBuckets[period] += l.fare;
+        });
+        const timeData = {
+            labels: ['朝', '昼', '夕', '夜'],
+            data: [timeBuckets.morning, timeBuckets.day, timeBuckets.evening, timeBuckets.night]
+        };
+
+        return {
+            labels,
+            data: chartData,
+            rides: filteredLogs.map(l => ({
+                app: l.app || 'nagashi',
+                fare: l.fare || 0,
+                area: l.area || '不明',
+                time: l.ride_time || ''
+            })),
+            timeData
+        };
+    }
+
+    async function initDashboard() {
+        // Fetch from Supabase or use sample data
+        const fetched = await fetchTaxiLogs();
+        if (fetched && fetched.length > 0) {
+            TAXI_LOGS = fetched;
+        } else {
+            TAXI_LOGS = SAMPLE_TAXI_LOGS;
+            console.log('📊 Using sample taxi logs');
+        }
         renderDashboard();
     }
 
     function renderDashboard() {
-        const data = REVENUE_DATA[dashboardPeriod];
-        const timeData = TIME_DATA[dashboardPeriod];
+        const processed = processDashboardData(TAXI_LOGS);
+        const data = processed;
+        const timeData = processed.timeData;
 
         // Calculate totals
         const totalRevenue = data.data.reduce((s, v) => s + v, 0);
         const totalRides = data.rides.length;
-        const avgFare = Math.round(totalRevenue / totalRides);
+        const avgFare = totalRides > 0 ? Math.round(totalRevenue / totalRides) : 0;
         const longRides = data.rides.filter(r => r.fare >= 3000).length;
-        const longRate = Math.round((longRides / totalRides) * 100);
+        const longRate = totalRides > 0 ? Math.round((longRides / totalRides) * 100) : 0;
 
         // App breakdown
         const uberTotal = data.rides.filter(r => r.app === 'uber').reduce((s, r) => s + r.fare, 0);
@@ -1175,19 +1291,19 @@
         document.getElementById('avgFare').textContent = `¥${avgFare.toLocaleString()}`;
         document.getElementById('longRate').textContent = `${longRate}%`;
 
-        // Comparison text
-        const periodText = dashboardPeriod === 'daily' ? '昨日比' : dashboardPeriod === 'weekly' ? '先週比' : '先月比';
-        document.getElementById('revenueCompare').innerHTML = `${periodText} <span class="summary-card-trend up">+12%</span>`;
-        document.getElementById('ridesCompare').innerHTML = `${periodText} <span class="summary-card-trend up">+3</span>`;
-        document.getElementById('avgCompare').innerHTML = `${periodText} <span class="summary-card-trend up">+8%</span>`;
+        // Comparison text (show period label only, actual comparison requires more historical data)
+        const periodLabel = dashboardPeriod === 'daily' ? '今日' : dashboardPeriod === 'weekly' ? '過去7日間' : '過去30日間';
+        document.getElementById('revenueCompare').textContent = periodLabel;
+        document.getElementById('ridesCompare').textContent = periodLabel;
+        document.getElementById('avgCompare').textContent = periodLabel;
 
         // App breakdown
         document.getElementById('uberRevenue').textContent = `¥${(uberTotal/1000).toFixed(0)}k`;
         document.getElementById('didiRevenue').textContent = `¥${(didiTotal/1000).toFixed(0)}k`;
         document.getElementById('nagashiRevenue').textContent = `¥${(nagashiTotal/1000).toFixed(0)}k`;
-        document.getElementById('uberPct').textContent = `${Math.round(uberTotal/totalRevenue*100)}%`;
-        document.getElementById('didiPct').textContent = `${Math.round(didiTotal/totalRevenue*100)}%`;
-        document.getElementById('nagashiPct').textContent = `${Math.round(nagashiTotal/totalRevenue*100)}%`;
+        document.getElementById('uberPct').textContent = totalRevenue > 0 ? `${Math.round(uberTotal/totalRevenue*100)}%` : '0%';
+        document.getElementById('didiPct').textContent = totalRevenue > 0 ? `${Math.round(didiTotal/totalRevenue*100)}%` : '0%';
+        document.getElementById('nagashiPct').textContent = totalRevenue > 0 ? `${Math.round(nagashiTotal/totalRevenue*100)}%` : '0%';
 
         // Revenue Chart
         if (revenueChart) revenueChart.destroy();
