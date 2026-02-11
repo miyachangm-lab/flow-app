@@ -339,6 +339,27 @@
         .preview-label { font-size: 12px; color: var(--gray-400); }
         .preview-value { font-size: 13px; color: white; font-weight: 600; }
 
+        /* Modal Input */
+        .modal-input {
+            width: 100%; padding: 12px 14px; background: var(--navy);
+            border: 1px solid rgba(255,255,255,0.15); border-radius: 8px;
+            color: white; font-size: 15px; font-family: 'Noto Sans JP', sans-serif;
+        }
+        .modal-input:focus { outline: none; border-color: var(--teal); }
+        .modal-input::placeholder { color: var(--gray-500); }
+
+        /* App Select Buttons */
+        .app-select-group { display: flex; gap: 8px; }
+        .app-select-btn {
+            flex: 1; padding: 12px 8px; border-radius: 8px;
+            border: 1.5px solid var(--gray-700); background: transparent;
+            color: var(--gray-400); font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .app-select-btn.active { border-color: var(--teal); background: var(--teal-dim); color: var(--teal-light); }
+        .app-select-btn[data-app="uber"].active { border-color: var(--uber-green); background: rgba(34,197,94,0.15); color: var(--uber-green); }
+        .app-select-btn[data-app="didi"].active { border-color: var(--didi-orange); background: rgba(249,115,22,0.15); color: var(--didi-orange); }
+
         /* Dashboard Styles */
         .dashboard-container { padding: 16px; }
         .dashboard-header { margin-bottom: 16px; }
@@ -598,6 +619,40 @@
 
     <!-- FAB Button -->
     <button class="fab" id="fabBtn">+</button>
+
+    <!-- Taxi Log Modal -->
+    <div class="modal-overlay" id="taxiModalOverlay"></div>
+    <div class="modal" id="taxiModal">
+        <div class="modal-header">
+            <div class="modal-title">🚕 乗車ログ追加</div>
+            <button class="modal-close" id="taxiModalClose">×</button>
+        </div>
+        <div class="modal-section">
+            <div class="modal-label">乗車時刻</div>
+            <input type="time" class="modal-input" id="taxiTime" value="">
+        </div>
+        <div class="modal-section">
+            <div class="modal-label">出発地</div>
+            <input type="text" class="modal-input" id="taxiFrom" placeholder="例: 梅田、難波、北新地">
+        </div>
+        <div class="modal-section">
+            <div class="modal-label">到着地（任意）</div>
+            <input type="text" class="modal-input" id="taxiTo" placeholder="例: 新大阪、伊丹空港">
+        </div>
+        <div class="modal-section">
+            <div class="modal-label">金額</div>
+            <input type="number" class="modal-input" id="taxiFare" placeholder="例: 3500" inputmode="numeric">
+        </div>
+        <div class="modal-section">
+            <div class="modal-label">アプリ</div>
+            <div class="app-select-group">
+                <button class="app-select-btn active" data-app="uber">🟢 Uber</button>
+                <button class="app-select-btn" data-app="didi">🟠 DiDi</button>
+                <button class="app-select-btn" data-app="nagashi">🚕 流し</button>
+            </div>
+        </div>
+        <button class="modal-btn" id="saveTaxiBtn">保存する</button>
+    </div>
 
     <!-- LINE Paste Modal -->
     <div class="modal-overlay" id="modalOverlay"></div>
@@ -1418,8 +1473,9 @@
     const modalOverlay = document.getElementById('modalOverlay');
     const lineModal = document.getElementById('lineModal');
 
-    function openModal() { modalOverlay.classList.add('active'); setTimeout(() => lineModal.classList.add('active'), 10); }
-    function closeModal() {
+    // LINE Modal functions
+    function openLineModal() { modalOverlay.classList.add('active'); setTimeout(() => lineModal.classList.add('active'), 10); }
+    function closeLineModal() {
         lineModal.classList.remove('active');
         setTimeout(() => {
             modalOverlay.classList.remove('active');
@@ -1431,9 +1487,121 @@
         }, 300);
     }
 
-    fabBtn.addEventListener('click', openModal);
-    document.getElementById('modalClose').addEventListener('click', closeModal);
-    modalOverlay.addEventListener('click', closeModal);
+    // Taxi Log Modal
+    const taxiModalOverlay = document.getElementById('taxiModalOverlay');
+    const taxiModal = document.getElementById('taxiModal');
+    let selectedApp = 'uber';
+
+    function openTaxiModal() {
+        // Set current time as default
+        const now = new Date();
+        document.getElementById('taxiTime').value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        document.getElementById('taxiFrom').value = '';
+        document.getElementById('taxiTo').value = '';
+        document.getElementById('taxiFare').value = '';
+        selectedApp = 'uber';
+        document.querySelectorAll('.app-select-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('.app-select-btn[data-app="uber"]').classList.add('active');
+
+        taxiModalOverlay.classList.add('active');
+        setTimeout(() => taxiModal.classList.add('active'), 10);
+    }
+
+    function closeTaxiModal() {
+        taxiModal.classList.remove('active');
+        setTimeout(() => taxiModalOverlay.classList.remove('active'), 300);
+    }
+
+    // App select buttons
+    document.querySelectorAll('.app-select-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.app-select-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            selectedApp = this.dataset.app;
+        });
+    });
+
+    // Save taxi log
+    document.getElementById('saveTaxiBtn').addEventListener('click', async () => {
+        const time = document.getElementById('taxiTime').value;
+        const from = document.getElementById('taxiFrom').value.trim();
+        const fare = parseInt(document.getElementById('taxiFare').value);
+
+        // Validation
+        if (!time) { alert('乗車時刻を入力してください'); return; }
+        if (!from) { alert('出発地を入力してください'); return; }
+        if (!fare || fare <= 0) { alert('金額を入力してください'); return; }
+
+        const today = new Date().toISOString().split('T')[0];
+        const record = {
+            ride_date: today,
+            ride_time: time,
+            area: from,
+            fare: fare,
+            app: selectedApp
+        };
+
+        // Save to Supabase
+        if (sb) {
+            try {
+                const { error } = await sb.from('flow_taxi_logs').insert([record]);
+                if (error) {
+                    console.error('Save error:', error);
+                    if (error.code === '42501') {
+                        alert('保存に失敗しました。\nRLSポリシーの設定が必要です。');
+                    } else {
+                        alert('保存に失敗しました: ' + error.message);
+                    }
+                    return;
+                }
+                console.log('✅ Taxi log saved');
+            } catch (e) {
+                console.error('Save error:', e);
+                alert('保存に失敗しました');
+                return;
+            }
+        } else {
+            console.log('📝 Taxi log (offline):', record);
+        }
+
+        // Close modal and refresh dashboard
+        closeTaxiModal();
+
+        // Add to local cache and refresh
+        TAXI_LOGS.unshift(record);
+        renderDashboard();
+
+        // Show success feedback
+        const btn = document.getElementById('saveTaxiBtn');
+        btn.textContent = '✅ 保存しました';
+        btn.style.background = '#22c55e';
+        setTimeout(() => {
+            btn.textContent = '保存する';
+            btn.style.background = '';
+        }, 1500);
+    });
+
+    // Taxi modal event listeners
+    document.getElementById('taxiModalClose').addEventListener('click', closeTaxiModal);
+    taxiModalOverlay.addEventListener('click', closeTaxiModal);
+    taxiModal.addEventListener('click', e => e.stopPropagation());
+
+    // FAB button - open different modal based on current tab
+    function getCurrentTab() {
+        const activeTab = document.querySelector('.tab.active');
+        return activeTab ? activeTab.dataset.tab : 'events';
+    }
+
+    fabBtn.addEventListener('click', () => {
+        if (getCurrentTab() === 'dashboard') {
+            openTaxiModal();
+        } else {
+            openLineModal();
+        }
+    });
+
+    document.getElementById('modalClose').addEventListener('click', closeLineModal);
+    modalOverlay.addEventListener('click', closeLineModal);
     lineModal.addEventListener('click', e => e.stopPropagation());
 
     document.getElementById('parseBtn').addEventListener('click', () => {
@@ -1484,7 +1652,7 @@
         EVENTS.push(newEvent);
         renderTimeline();
         updateNextBanner(EVENTS);
-        closeModal();
+        closeLineModal();
 
         // Switch to events tab
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
