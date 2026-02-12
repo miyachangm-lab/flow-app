@@ -616,29 +616,56 @@
         .navi-recommend-detail {
             font-size: 12px; color: var(--gray-400);
         }
-        .navi-subtabs {
-            display: flex; flex-direction: column; gap: 0; margin: 0 16px;
+        /* Bottom Sheet */
+        .navi-bottom-sheet {
+            position: fixed; left: 0; right: 0; bottom: 0;
+            background: var(--navy); border-radius: 20px 20px 0 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+            z-index: 1000; transition: transform 0.3s ease;
+            touch-action: none;
         }
-        .navi-subtab {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 14px;
+        .navi-bottom-sheet-handle {
+            display: flex; justify-content: center; padding: 12px 0 8px;
+            cursor: grab; touch-action: none;
+        }
+        .navi-bottom-sheet-handle-bar {
+            width: 40px; height: 4px; border-radius: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+        .navi-bottom-sheet-tabs {
+            display: flex; gap: 8px; padding: 0 16px 12px;
+        }
+        .navi-sheet-tab {
+            flex: 1; padding: 12px 16px; text-align: center;
             font-size: 13px; font-weight: 600; color: var(--gray-400);
+            background: var(--navy-light); border-radius: 10px;
             cursor: pointer; transition: all 0.2s;
-            background: var(--navy-light); border-radius: 8px; margin-bottom: 6px;
         }
-        .navi-subtab:hover { background: var(--gray-700); }
-        .navi-subtab.open { color: white; }
-        .navi-subtab.event.open { color: #ff9800; }
-        .navi-subtab.hotel-long.open { color: #ce93d8; }
-        .navi-subtab-arrow {
-            font-size: 10px; transition: transform 0.2s;
+        .navi-sheet-tab.active { color: white; }
+        .navi-sheet-tab.event.active { color: #ff9800; background: rgba(255,152,0,0.15); }
+        .navi-sheet-tab.hotel.active { color: #ce93d8; background: rgba(156,39,176,0.15); }
+        .navi-bottom-sheet-content {
+            overflow-y: auto; overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
         }
-        .navi-subtab.open .navi-subtab-arrow { transform: rotate(90deg); }
+        .navi-sheet-recommend {
+            background: linear-gradient(135deg, rgba(255,152,0,0.1) 0%, var(--navy-light) 100%);
+            border: 1px solid rgba(255,152,0,0.3);
+            border-radius: 12px; padding: 12px 14px; margin: 0 16px 12px;
+        }
+        .navi-sheet-recommend-header {
+            font-size: 11px; color: #ff9800; font-weight: 600; margin-bottom: 6px;
+        }
+        .navi-sheet-recommend-venue {
+            font-size: 15px; font-weight: 700; color: white; margin-bottom: 2px;
+        }
+        .navi-sheet-recommend-detail {
+            font-size: 11px; color: var(--gray-400);
+        }
         .navi-list {
-            padding: 0 16px 8px; display: none; flex-direction: column; gap: 8px;
-            max-height: 300px; overflow-y: auto;
+            padding: 0 16px 16px; display: flex; flex-direction: column; gap: 8px;
         }
-        .navi-list.open { display: flex; }
         .navi-list-item {
             display: flex; align-items: center; gap: 10px;
             background: var(--navy-light); border-radius: 10px;
@@ -823,7 +850,7 @@
                     <span>💰 ロング</span>
                 </button>
             </div>
-            <div style="position: relative; height: calc(70vh - 60px); min-height: 350px;">
+            <div style="position: relative; height: calc(100vh - 180px); min-height: 400px;">
                 <div id="long-map"></div>
                 <div class="navi-legend">
                     <div class="navi-legend-title">マーカー</div>
@@ -843,23 +870,28 @@
                 </div>
             </div>
         </div>
-        <div class="navi-recommend" id="navi-recommend">
-            <div class="navi-recommend-header">🎯 おすすめ待機</div>
-            <div class="navi-recommend-venue" id="navi-recommend-venue">--</div>
-            <div class="navi-recommend-detail" id="navi-recommend-detail">--</div>
-            <div class="navi-recommend-text" id="navi-recommend-text"></div>
-        </div>
-        <div class="navi-subtabs">
-            <div class="navi-subtab event" id="navi-subtab-event" onclick="toggleNaviAccordion('event')">
-                <span>🔴 イベント <span id="navi-event-count">0件</span></span>
-                <span class="navi-subtab-arrow">▶</span>
+        <!-- Bottom Sheet -->
+        <div class="navi-bottom-sheet" id="navi-bottom-sheet">
+            <div class="navi-bottom-sheet-handle" id="navi-sheet-handle">
+                <div class="navi-bottom-sheet-handle-bar"></div>
             </div>
-            <div class="navi-list" id="navi-list-event"></div>
-            <div class="navi-subtab hotel-long" id="navi-subtab-hotel" onclick="toggleNaviAccordion('hotel')">
-                <span>🟣 ホテル・ロング <span id="navi-hotel-count">0件</span></span>
-                <span class="navi-subtab-arrow">▶</span>
+            <div class="navi-bottom-sheet-tabs">
+                <div class="navi-sheet-tab event active" id="navi-sheet-tab-event" onclick="switchNaviSheetTab('event')">
+                    🔴 イベント <span id="navi-event-count">0件</span>
+                </div>
+                <div class="navi-sheet-tab hotel" id="navi-sheet-tab-hotel" onclick="switchNaviSheetTab('hotel')">
+                    🟣 ホテル・ロング <span id="navi-hotel-count">0件</span>
+                </div>
             </div>
-            <div class="navi-list" id="navi-list-hotel"></div>
+            <div class="navi-bottom-sheet-content" id="navi-sheet-content">
+                <div class="navi-sheet-recommend" id="navi-recommend">
+                    <div class="navi-sheet-recommend-header">🎯 おすすめ待機</div>
+                    <div class="navi-sheet-recommend-venue" id="navi-recommend-venue">--</div>
+                    <div class="navi-sheet-recommend-detail" id="navi-recommend-detail">--</div>
+                </div>
+                <div class="navi-list" id="navi-list-event" style="display: flex;"></div>
+                <div class="navi-list" id="navi-list-hotel" style="display: none;"></div>
+            </div>
         </div>
     </div>
 
@@ -1711,6 +1743,7 @@
             attribution: '© OpenStreetMap © CartoDB', maxZoom: 19
         }).addTo(longMap);
         fetchNaviEvents();
+        initBottomSheet();
         // Update every minute
         if (naviUpdateInterval) clearInterval(naviUpdateInterval);
         naviUpdateInterval = setInterval(() => {
@@ -1885,15 +1918,104 @@
         }
     }
 
-    // Toggle navi accordion
-    function toggleNaviAccordion(type) {
-        const subtab = document.getElementById(`navi-subtab-${type}`);
-        const list = document.getElementById(`navi-list-${type}`);
-        if (!subtab || !list) return;
+    // Bottom Sheet Control
+    let sheetState = 0; // 0=min, 1=mid, 2=max
+    const SHEET_HEIGHTS = [100, window.innerHeight * 0.5, window.innerHeight * 0.85];
+    let sheetStartY = 0, sheetCurrentY = 0, sheetDragging = false;
 
-        const isOpen = subtab.classList.contains('open');
-        subtab.classList.toggle('open', !isOpen);
-        list.classList.toggle('open', !isOpen);
+    function initBottomSheet() {
+        const sheet = document.getElementById('navi-bottom-sheet');
+        const handle = document.getElementById('navi-sheet-handle');
+        const content = document.getElementById('navi-sheet-content');
+        if (!sheet || !handle) return;
+
+        // Set initial position
+        updateSheetPosition();
+
+        // Touch events on handle
+        handle.addEventListener('touchstart', onSheetTouchStart, { passive: false });
+        handle.addEventListener('touchmove', onSheetTouchMove, { passive: false });
+        handle.addEventListener('touchend', onSheetTouchEnd, { passive: false });
+
+        // Click on handle to toggle
+        handle.addEventListener('click', () => {
+            sheetState = (sheetState + 1) % 3;
+            updateSheetPosition();
+        });
+
+        // Update content height based on sheet state
+        updateContentHeight();
+    }
+
+    function onSheetTouchStart(e) {
+        sheetDragging = true;
+        sheetStartY = e.touches[0].clientY;
+        sheetCurrentY = sheetStartY;
+        const sheet = document.getElementById('navi-bottom-sheet');
+        if (sheet) sheet.style.transition = 'none';
+    }
+
+    function onSheetTouchMove(e) {
+        if (!sheetDragging) return;
+        e.preventDefault();
+        sheetCurrentY = e.touches[0].clientY;
+        const deltaY = sheetStartY - sheetCurrentY;
+        const currentHeight = SHEET_HEIGHTS[sheetState];
+        let newHeight = currentHeight + deltaY;
+        newHeight = Math.max(SHEET_HEIGHTS[0], Math.min(SHEET_HEIGHTS[2], newHeight));
+
+        const sheet = document.getElementById('navi-bottom-sheet');
+        if (sheet) {
+            sheet.style.transform = `translateY(calc(100% - ${newHeight}px))`;
+        }
+    }
+
+    function onSheetTouchEnd(e) {
+        if (!sheetDragging) return;
+        sheetDragging = false;
+
+        const sheet = document.getElementById('navi-bottom-sheet');
+        if (sheet) sheet.style.transition = 'transform 0.3s ease';
+
+        const deltaY = sheetStartY - sheetCurrentY;
+        const threshold = 50;
+
+        if (deltaY > threshold) {
+            // Swiped up
+            sheetState = Math.min(2, sheetState + 1);
+        } else if (deltaY < -threshold) {
+            // Swiped down
+            sheetState = Math.max(0, sheetState - 1);
+        }
+
+        updateSheetPosition();
+    }
+
+    function updateSheetPosition() {
+        const sheet = document.getElementById('navi-bottom-sheet');
+        if (!sheet) return;
+
+        const height = SHEET_HEIGHTS[sheetState];
+        sheet.style.transform = `translateY(calc(100% - ${height}px))`;
+        updateContentHeight();
+    }
+
+    function updateContentHeight() {
+        const content = document.getElementById('navi-sheet-content');
+        if (!content) return;
+
+        // Header (handle + tabs) is about 80px
+        const headerHeight = 80;
+        const contentHeight = SHEET_HEIGHTS[sheetState] - headerHeight;
+        content.style.maxHeight = Math.max(0, contentHeight) + 'px';
+    }
+
+    // Switch sheet tab
+    function switchNaviSheetTab(tab) {
+        document.getElementById('navi-sheet-tab-event').classList.toggle('active', tab === 'event');
+        document.getElementById('navi-sheet-tab-hotel').classList.toggle('active', tab === 'hotel');
+        document.getElementById('navi-list-event').style.display = tab === 'event' ? 'flex' : 'none';
+        document.getElementById('navi-list-hotel').style.display = tab === 'hotel' ? 'flex' : 'none';
     }
 
     // Render navi list
@@ -2011,7 +2133,6 @@
     function updateNaviRecommend() {
         const venueEl = document.getElementById('navi-recommend-venue');
         const detailEl = document.getElementById('navi-recommend-detail');
-        const textEl = document.getElementById('navi-recommend-text');
 
         const activeEvents = naviEvents
             .map(e => ({ ...e, mins: getEventMinutesRemaining(e.endTime) }))
@@ -2019,15 +2140,13 @@
             .sort((a, b) => a.mins - b.mins);
 
         if (activeEvents.length === 0) {
-            venueEl.textContent = 'イベントなし';
-            detailEl.textContent = '';
-            textEl.textContent = 'ホテル・ロングスポットを確認しましょう';
+            if (venueEl) venueEl.textContent = 'イベントなし';
+            if (detailEl) detailEl.textContent = 'ホテル・ロングスポットを確認';
             return;
         }
 
         const nearest = activeEvents[0];
-        venueEl.textContent = nearest.venue;
-        detailEl.textContent = `${nearest.mins}分後終了${nearest.people ? ` / 約${nearest.people.toLocaleString()}人` : ''}`;
+        if (venueEl) venueEl.textContent = nearest.venue;
 
         // Check for nearby hotels
         let nearbyHotel = null;
@@ -2040,11 +2159,10 @@
             });
         }
 
-        if (nearbyHotel) {
-            textEl.textContent = `近くの${nearbyHotel.name}でもロング狙い◎`;
-        } else {
-            textEl.textContent = '';
-        }
+        let detail = `${nearest.mins}分後終了`;
+        if (nearest.people) detail += ` / 約${nearest.people.toLocaleString()}人`;
+        if (nearbyHotel) detail += ` / 近くに${nearbyHotel.name}`;
+        if (detailEl) detailEl.textContent = detail;
     }
 
     // Go to current location (navi tab)
