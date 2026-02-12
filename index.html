@@ -1468,7 +1468,6 @@
         '天王寺動物': { category: 'facility', rank: 'B', fullName: '天王寺動物園' }
     };
 
-    let parsedEvent = null;
     const fabBtn = document.getElementById('fabBtn');
     const modalOverlay = document.getElementById('modalOverlay');
     const lineModal = document.getElementById('lineModal');
@@ -1483,7 +1482,7 @@
             document.getElementById('parsePreview').classList.remove('active');
             document.getElementById('addEventBtn').style.display = 'none';
             document.getElementById('parseBtn').style.display = 'block';
-            parsedEvent = null;
+            parsedEvents = [];
         }, 300);
     }
 
@@ -1604,128 +1603,192 @@
     modalOverlay.addEventListener('click', closeLineModal);
     lineModal.addEventListener('click', e => e.stopPropagation());
 
+    // Parse multiple events from text
+    function parseEventsFromText(text) {
+        const events = [];
+        const lines = text.split('\n');
+        let currentEvent = null;
+
+        for (const line of lines) {
+            // Check for venue keywords
+            for (const [kw, info] of Object.entries(VENUE_KEYWORDS)) {
+                if (line.includes(kw)) {
+                    // Save previous event if exists
+                    if (currentEvent && currentEvent.venue) {
+                        events.push(currentEvent);
+                    }
+                    // Start new event
+                    currentEvent = {
+                        venue: kw,
+                        venueFull: info.fullName,
+                        category: info.category,
+                        rank: info.rank,
+                        endTime: null,
+                        count: null,
+                        detail: line.trim()
+                    };
+                    break;
+                }
+            }
+
+            // Extract time for current event
+            if (currentEvent) {
+                const tm = line.match(/(\d{1,2}):(\d{2})/g);
+                if (tm) currentEvent.endTime = tm[tm.length - 1];
+                const cm = line.match(/(\d+)名/);
+                if (cm) currentEvent.count = parseInt(cm[1]);
+            }
+        }
+
+        // Don't forget last event
+        if (currentEvent && currentEvent.venue) {
+            events.push(currentEvent);
+        }
+
+        // If no events found by line parsing, try single event parse
+        if (events.length === 0) {
+            for (const [kw, info] of Object.entries(VENUE_KEYWORDS)) {
+                if (text.includes(kw)) {
+                    const tm = text.match(/(\d{1,2}):(\d{2})/g);
+                    const cm = text.match(/(\d+)名/);
+                    events.push({
+                        venue: kw,
+                        venueFull: info.fullName,
+                        category: info.category,
+                        rank: info.rank,
+                        endTime: tm ? tm[tm.length - 1] : null,
+                        count: cm ? parseInt(cm[1]) : null,
+                        detail: text.trim().substring(0, 100)
+                    });
+                    break;
+                }
+            }
+        }
+
+        return events;
+    }
+
+    let parsedEvents = [];
+
     document.getElementById('parseBtn').addEventListener('click', () => {
         const text = document.getElementById('lineTextarea').value;
         if (!text.trim()) return;
 
-        const result = { venue: null, venueFull: null, category: null, rank: null, endTime: null, count: null };
-        for (const [kw, info] of Object.entries(VENUE_KEYWORDS)) {
-            if (text.includes(kw)) { result.venue = kw; result.venueFull = info.fullName; result.category = info.category; result.rank = info.rank; break; }
+        parsedEvents = parseEventsFromText(text);
+
+        if (parsedEvents.length === 0) {
+            alert('会場情報が見つかりませんでした');
+            return;
         }
-        const tm = text.match(/(\d{1,2}):(\d{2})/g);
-        if (tm) result.endTime = tm[tm.length - 1];
-        const cm = text.match(/(\d+)名/);
-        if (cm) result.count = parseInt(cm[1]);
 
-        if (!result.venue) { alert('会場情報が見つかりませんでした'); return; }
+        // Show preview
+        if (parsedEvents.length === 1) {
+            const e = parsedEvents[0];
+            document.getElementById('previewVenue').textContent = e.venueFull || e.venue;
+            document.getElementById('previewTime').textContent = e.endTime || '未検出';
+            document.getElementById('previewCount').textContent = e.count ? `${e.count}名` : '未検出';
+            document.getElementById('previewRank').textContent = e.rank || '-';
+        } else {
+            document.getElementById('previewVenue').textContent = `${parsedEvents.length}件のイベント`;
+            document.getElementById('previewTime').textContent = parsedEvents.map(e => e.endTime || '?').join(', ');
+            document.getElementById('previewCount').textContent = '-';
+            document.getElementById('previewRank').textContent = '-';
+        }
 
-        parsedEvent = result;
-        document.getElementById('previewVenue').textContent = result.venueFull || result.venue;
-        document.getElementById('previewTime').textContent = result.endTime || '未検出';
-        document.getElementById('previewCount').textContent = result.count ? `${result.count}名` : '未検出';
-        document.getElementById('previewRank').textContent = result.rank || '-';
         document.getElementById('parsePreview').classList.add('active');
         document.getElementById('parseBtn').style.display = 'none';
         document.getElementById('addEventBtn').style.display = 'block';
     });
 
     document.getElementById('addEventBtn').addEventListener('click', async () => {
-        if (!parsedEvent) return;
+        if (!parsedEvents || parsedEvents.length === 0) return;
 
         const btn = document.getElementById('addEventBtn');
         const originalText = btn.textContent;
         btn.disabled = true;
         btn.textContent = '保存中...';
 
-        const newEvent = {
-            venue: parsedEvent.venueFull, type: parsedEvent.category, rank: parsedEvent.rank,
-            endTime: parsedEvent.endTime || '21:00', label: '終了予定', people: parsedEvent.count,
-            artist: null, detail: null, startTime: null, memo: null, source: 'manual'
-        };
-
-        let saveSuccess = false;
         const today = new Date().toISOString().split('T')[0];
+        let addedCount = 0;
+        let skippedCount = 0;
+        let errorCount = 0;
 
-        // Save to Supabase
-        if (sb) {
-            try {
-                // Check for duplicate (same date, venue, end_time)
-                const { data: existing, error: selectError } = await sb
-                    .from('flow_manual_events')
-                    .select('id')
-                    .eq('event_date', today)
-                    .eq('venue', newEvent.venue)
-                    .eq('end_time', newEvent.endTime)
-                    .limit(1);
+        for (const parsed of parsedEvents) {
+            const newEvent = {
+                venue: parsed.venueFull, type: parsed.category, rank: parsed.rank,
+                endTime: parsed.endTime || '21:00', label: '終了予定', people: parsed.count,
+                artist: null, detail: parsed.detail || null, startTime: null, memo: null, source: 'manual'
+            };
 
-                if (selectError) {
-                    console.warn('Duplicate check failed:', selectError);
-                    btn.textContent = '❌ 重複チェックに失敗しました';
-                    btn.style.background = '#ef4444';
-                    setTimeout(() => {
-                        btn.textContent = originalText;
-                        btn.style.background = '';
-                        btn.disabled = false;
-                    }, 2000);
-                    return;
+            if (sb) {
+                try {
+                    // Check for duplicate (same date, venue, end_time, AND detail)
+                    const { data: existing, error: selectError } = await sb
+                        .from('flow_manual_events')
+                        .select('id')
+                        .eq('event_date', today)
+                        .eq('venue', newEvent.venue)
+                        .eq('end_time', newEvent.endTime)
+                        .eq('detail', newEvent.detail || '')
+                        .limit(1);
+
+                    if (selectError) {
+                        console.warn('Duplicate check failed:', selectError);
+                        errorCount++;
+                        continue;
+                    }
+
+                    if (existing && existing.length > 0) {
+                        console.log('⚠️ Duplicate event skipped:', newEvent.venue);
+                        skippedCount++;
+                        continue;
+                    }
+
+                    // Insert new event
+                    const { error } = await sb.from('flow_manual_events').insert([{
+                        event_date: today, venue: newEvent.venue, detail: newEvent.detail || '',
+                        event_type: newEvent.type, rank: newEvent.rank, end_time: newEvent.endTime,
+                        people_count: newEvent.people || null
+                    }]);
+
+                    if (error) {
+                        console.warn('Save failed:', error);
+                        errorCount++;
+                        continue;
+                    }
+
+                    addedCount++;
+                    EVENTS.push(newEvent);
+                    console.log('✅ Event saved:', newEvent.venue);
+
+                } catch (e) {
+                    console.warn('Save failed:', e);
+                    errorCount++;
                 }
-
-                if (existing && existing.length > 0) {
-                    console.log('⚠️ Duplicate event found');
-                    btn.textContent = '⚠️ すでに登録済みです';
-                    btn.style.background = '#f59e0b';
-                    setTimeout(() => {
-                        btn.textContent = originalText;
-                        btn.style.background = '';
-                        btn.disabled = false;
-                    }, 2000);
-                    return;
-                }
-
-                // Insert new event
-                const { error } = await sb.from('flow_manual_events').insert([{
-                    event_date: today, venue: newEvent.venue, detail: newEvent.detail || '',
-                    event_type: newEvent.type, rank: newEvent.rank, end_time: newEvent.endTime,
-                    people_count: newEvent.people || null
-                }]);
-
-                if (error) {
-                    console.warn('Save failed:', error);
-                    btn.textContent = '❌ 保存に失敗しました';
-                    btn.style.background = '#ef4444';
-                    setTimeout(() => {
-                        btn.textContent = originalText;
-                        btn.style.background = '';
-                        btn.disabled = false;
-                    }, 2000);
-                    return;
-                }
-
-                saveSuccess = true;
-                console.log('✅ Event saved to Supabase');
-            } catch (e) {
-                console.warn('Save failed:', e);
-                btn.textContent = '❌ 保存に失敗しました';
-                btn.style.background = '#ef4444';
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '';
-                    btn.disabled = false;
-                }, 2000);
-                return;
+            } else {
+                // Supabase未接続の場合はローカルのみ
+                addedCount++;
+                EVENTS.push(newEvent);
             }
-        } else {
-            // Supabase未接続の場合はローカルのみ
-            saveSuccess = true;
         }
 
-        // Show success feedback
-        btn.textContent = '✅ 保存しました';
-        btn.style.background = '#22c55e';
-
-        EVENTS.push(newEvent);
+        // Show result
         renderTimeline();
         updateNextBanner(EVENTS);
+
+        if (addedCount > 0 && skippedCount === 0 && errorCount === 0) {
+            btn.textContent = `✅ ${addedCount}件追加しました`;
+            btn.style.background = '#22c55e';
+        } else if (addedCount > 0) {
+            btn.textContent = `✅ ${addedCount}件追加、${skippedCount}件スキップ`;
+            btn.style.background = '#22c55e';
+        } else if (skippedCount > 0) {
+            btn.textContent = `⚠️ ${skippedCount}件すべて登録済み`;
+            btn.style.background = '#f59e0b';
+        } else {
+            btn.textContent = '❌ 保存に失敗しました';
+            btn.style.background = '#ef4444';
+        }
 
         // Close modal after brief delay to show success message
         setTimeout(() => {
