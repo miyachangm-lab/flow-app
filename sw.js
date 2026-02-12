@@ -1,5 +1,5 @@
 // FLOW App Service Worker
-const CACHE_VERSION = 'flow-v1.0.0';
+const CACHE_VERSION = 'flow-v1.0.1';
 const CACHE_NAME = CACHE_VERSION;
 
 const STATIC_ASSETS = [
