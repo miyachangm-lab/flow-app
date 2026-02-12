@@ -1766,6 +1766,17 @@
 
     // Auto-refresh every 60s
     setInterval(() => updateNextBanner(EVENTS), 60000);
+
+    // Unregister any existing Service Workers
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+            registrations.forEach(registration => {
+                registration.unregister().then(() => {
+                    console.log('✅ Service Worker unregistered');
+                });
+            });
+        });
+    }
     </script>
 </body>
 </html>
