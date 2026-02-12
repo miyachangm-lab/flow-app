@@ -1644,11 +1644,33 @@
         };
 
         let saveSuccess = false;
+        const today = new Date().toISOString().split('T')[0];
 
         // Save to Supabase
         if (sb) {
             try {
-                const today = new Date().toISOString().split('T')[0];
+                // Check for duplicate (same date, venue, end_time)
+                const { data: existing } = await sb
+                    .from('flow_manual_events')
+                    .select('id')
+                    .eq('event_date', today)
+                    .eq('venue', newEvent.venue)
+                    .eq('end_time', newEvent.endTime)
+                    .limit(1);
+
+                if (existing && existing.length > 0) {
+                    console.log('⚠️ Duplicate event found');
+                    btn.textContent = '⚠️ すでに登録済みです';
+                    btn.style.background = '#f59e0b';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                    }, 2000);
+                    return;
+                }
+
+                // Insert new event
                 const { error } = await sb.from('flow_manual_events').insert([{
                     event_date: today, venue: newEvent.venue, detail: newEvent.detail || '',
                     event_type: newEvent.type, rank: newEvent.rank, end_time: newEvent.endTime,
