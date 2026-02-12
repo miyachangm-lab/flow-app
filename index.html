@@ -413,6 +413,127 @@
         .breakdown-label { font-size: 10px; color: var(--gray-400); margin-bottom: 4px; }
         .breakdown-value { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: white; }
         .breakdown-pct { font-size: 10px; color: var(--gray-500); }
+
+        /* Hotspot Tab Styles */
+        .hotspot-filter-bar {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 16px; background: var(--navy-light);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .hotspot-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px; border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+        }
+        .hotspot-badge.time {
+            background: rgba(0,230,118,0.15); color: #00e676;
+            border: 1px solid rgba(0,230,118,0.3);
+        }
+        .hotspot-badge.day {
+            background: rgba(148,163,184,0.15); color: var(--gray-300);
+            border: 1px solid rgba(148,163,184,0.2);
+        }
+        .hotspot-pulse-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #00e676;
+            animation: hotspotPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes hotspotPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+        .hotspot-count {
+            margin-left: auto; font-size: 11px; color: var(--gray-400);
+        }
+        .hotspot-recommend {
+            position: absolute; top: 16px; right: 16px; z-index: 1000;
+            background: rgba(10,10,20,0.88); backdrop-filter: blur(12px);
+            border-radius: 12px; padding: 14px 18px;
+            border: 1px solid rgba(255,255,255,0.1);
+            min-width: 160px;
+        }
+        .hotspot-recommend-label {
+            font-size: 11px; color: #00e676; font-weight: 600;
+            margin-bottom: 6px; display: flex; align-items: center; gap: 4px;
+        }
+        .hotspot-recommend-area {
+            font-size: 20px; font-weight: 900; color: white; margin-bottom: 4px;
+        }
+        .hotspot-recommend-detail {
+            font-size: 11px; color: var(--gray-400);
+        }
+        .hotspot-insight {
+            background: var(--navy-light);
+            border: 1px solid rgba(0,230,118,0.3);
+            border-radius: 12px; padding: 14px 16px;
+            margin: 12px 16px;
+        }
+        .hotspot-insight-header {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; color: #00e676; font-weight: 600; margin-bottom: 8px;
+        }
+        .hotspot-insight-text {
+            font-size: 13px; color: var(--gray-300); line-height: 1.6;
+        }
+        .hotspot-empty {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; height: 300px; color: var(--gray-400);
+            text-align: center; padding: 20px;
+        }
+        .hotspot-empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .hotspot-empty-text { font-size: 14px; margin-bottom: 8px; }
+        .hotspot-empty-sub { font-size: 12px; color: var(--gray-500); }
+        .hotspot-circle-label {
+            font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 900;
+            color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+        .hotspot-area-label {
+            font-size: 10px; font-weight: 600; color: white;
+            background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px;
+            white-space: nowrap;
+        }
+        .hotspot-legend {
+            position: absolute; bottom: 20px; left: 16px; z-index: 1000;
+            background: rgba(10,10,20,0.88); backdrop-filter: blur(12px);
+            border-radius: 10px; padding: 12px 14px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .hotspot-legend-title {
+            font-size: 10px; color: var(--gray-400); text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 8px; font-weight: 600;
+        }
+        .hotspot-legend-item {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 6px; font-size: 11px; color: var(--gray-300);
+        }
+        .hotspot-legend-item:last-child { margin-bottom: 0; }
+        .hotspot-legend-circle {
+            width: 14px; height: 14px; border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+        .hotspot-legend-circle.high { background: rgba(0,230,118,0.4); border-color: #00e676; }
+        .hotspot-legend-circle.medium { background: rgba(255,183,77,0.3); border-color: #ffb74d; }
+        .hotspot-legend-circle.low { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.4); }
+        .hotspot-location-btn {
+            position: absolute; bottom: 20px; right: 16px; z-index: 1000;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(10,10,20,0.88); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .hotspot-location-btn:active { transform: scale(0.95); }
+        .hotspot-location-btn svg { width: 22px; height: 22px; }
+        .current-location-marker {
+            width: 16px; height: 16px; border-radius: 50%;
+            background: #4285f4; border: 3px solid white;
+            box-shadow: 0 0 0 2px rgba(66,133,244,0.3), 0 2px 8px rgba(0,0,0,0.3);
+            animation: currentLocationPulse 2s ease-in-out infinite;
+        }
+        @keyframes currentLocationPulse {
+            0%, 100% { box-shadow: 0 0 0 2px rgba(66,133,244,0.3), 0 2px 8px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 0 0 8px rgba(66,133,244,0.15), 0 2px 8px rgba(0,0,0,0.3); }
+        }
     </style>
 </head>
 
@@ -429,7 +550,7 @@
     <!-- Tab Bar -->
     <div class="tab-bar">
         <div class="tab active" data-tab="events"><span class="tab-icon">📅</span>イベント</div>
-        <div class="tab" data-tab="apps"><span class="tab-icon">📱</span>アプリ</div>
+        <div class="tab" data-tab="apps"><span class="tab-icon">🔥</span>ホットスポット</div>
         <div class="tab" data-tab="long"><span class="tab-icon">🗺</span>ロング</div>
         <div class="tab" data-tab="dashboard"><span class="tab-icon">📊</span>収益</div>
     </div>
@@ -455,41 +576,43 @@
         </div>
     </div>
 
-    <!-- Apps Tab Content -->
+    <!-- Hotspot Tab Content -->
     <div class="content" id="apps-content">
         <div class="map-container">
-            <div class="filter-toggle-bar" onclick="toggleFilter(this)">🔧 フィルター <span class="arrow">▼</span></div>
-            <div class="map-filters" id="apps-filters">
-                <div class="filter-section">
-                    <div class="filter-label">表示切替</div>
-                    <div class="toggle-group">
-                        <button class="toggle-btn active" data-view="pin">📍 ピン表示</button>
-                        <button class="toggle-btn" data-view="heat">🔥 ヒートマップ</button>
-                    </div>
+            <div class="hotspot-filter-bar" id="hotspot-filter-bar">
+                <div class="hotspot-badge time">
+                    <div class="hotspot-pulse-dot"></div>
+                    <span id="hotspot-time-range">--:-- 〜 --:--</span>
                 </div>
-                <div class="filter-section">
-                    <div class="filter-label">時間帯</div>
-                    <div class="filter-group">
-                        <button class="filter-btn active" data-period="all">全て</button>
-                        <button class="filter-btn" data-period="morning">🌅 朝</button>
-                        <button class="filter-btn" data-period="day">☀️ 昼</button>
-                        <button class="filter-btn" data-period="evening">🌆 夜</button>
-                        <button class="filter-btn" data-period="night">🌙 深夜</button>
-                    </div>
-                </div>
-                <div class="filter-section">
-                    <div class="filter-label">アプリ</div>
-                    <div class="filter-group">
-                        <button class="filter-btn active" data-app="all">全て</button>
-                        <button class="filter-btn" data-app="uber">Uber</button>
-                        <button class="filter-btn" data-app="didi">DiDi</button>
-                    </div>
-                </div>
+                <div class="hotspot-badge day" id="hotspot-day">--曜</div>
+                <div class="hotspot-count" id="hotspot-count">過去の同条件 0件</div>
             </div>
             <div style="position: relative; flex: 1;">
                 <div id="map"></div>
-                <div class="map-legend" id="app-legend"></div>
-                <div class="map-stats" id="app-stats"></div>
+                <div class="hotspot-recommend" id="hotspot-recommend" style="display: none;">
+                    <div class="hotspot-recommend-label">🎯 今のおすすめ</div>
+                    <div class="hotspot-recommend-area" id="hotspot-recommend-area">--</div>
+                    <div class="hotspot-recommend-detail" id="hotspot-recommend-detail">-- 件</div>
+                </div>
+                <div class="hotspot-legend">
+                    <div class="hotspot-legend-title">乗車実績</div>
+                    <div class="hotspot-legend-item"><div class="hotspot-legend-circle high"></div><span>3回以上</span></div>
+                    <div class="hotspot-legend-item"><div class="hotspot-legend-circle medium"></div><span>2回</span></div>
+                    <div class="hotspot-legend-item"><div class="hotspot-legend-circle low"></div><span>1回</span></div>
+                </div>
+                <div class="hotspot-location-btn" id="hotspot-location-btn" onclick="goToCurrentLocation()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#4285f4" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <line x1="12" y1="2" x2="12" y2="6"/>
+                        <line x1="12" y1="18" x2="12" y2="22"/>
+                        <line x1="2" y1="12" x2="6" y2="12"/>
+                        <line x1="18" y1="12" x2="22" y2="12"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="hotspot-insight" id="hotspot-insight" style="display: none;">
+                <div class="hotspot-insight-header">💡 インサイト</div>
+                <div class="hotspot-insight-text" id="hotspot-insight-text"></div>
             </div>
         </div>
     </div>
@@ -967,25 +1090,61 @@
     ];
 
     // ========================================
-    // APP TAB - Map
+    // HOTSPOT TAB - Map
     // ========================================
-    const APP_PICKUPS = [
-        { lat: 34.7010, lng: 135.4975, app: 'uber', time: '7:20', date: '2/6', area: '梅田' },
-        { lat: 34.6690, lng: 135.5020, app: 'didi', time: '19:45', date: '2/6', area: 'なんば' },
-        { lat: 34.7025, lng: 135.4950, app: 'uber', time: '23:15', date: '2/6', area: '北新地' },
-        { lat: 34.6873, lng: 135.5320, app: 'uber', time: '21:30', date: '2/6', area: '大阪城公園' },
-        { lat: 34.6595, lng: 135.5075, app: 'didi', time: '14:20', date: '2/6', area: '難波' },
-        { lat: 34.7052, lng: 135.4876, app: 'uber', time: '8:30', date: '2/7', area: '梅田スカイビル' },
-        { lat: 34.6914, lng: 135.4946, app: 'didi', time: '20:00', date: '2/7', area: '中之島' },
-        { lat: 34.6810, lng: 135.4960, app: 'uber', time: '18:45', date: '2/7', area: '本町' },
-        { lat: 34.6654, lng: 135.4324, app: 'didi', time: '11:30', date: '2/7', area: 'USJ' },
-        { lat: 34.6932, lng: 135.5199, app: 'uber', time: '22:10', date: '2/7', area: 'OBP' },
-        { lat: 34.6545, lng: 135.4290, app: 'uber', time: '16:00', date: '2/8', area: '天保山' },
-        { lat: 34.6481, lng: 135.5082, app: 'didi', time: '13:45', date: '2/8', area: '天王寺' },
-        { lat: 34.7015, lng: 135.4965, app: 'uber', time: '6:20', date: '2/8', area: '梅田' },
-        { lat: 34.6694, lng: 135.4762, app: 'didi', time: '21:00', date: '2/8', area: '京セラドーム' },
-        { lat: 34.6890, lng: 135.4840, app: 'uber', time: '19:30', date: '2/8', area: '中之島' }
-    ];
+    const AREA_COORDS = {
+        '梅田': { lat: 34.7010, lng: 135.4975 },
+        '北新地': { lat: 34.7025, lng: 135.4950 },
+        '難波': { lat: 34.6650, lng: 135.5015 },
+        'なんば': { lat: 34.6650, lng: 135.5015 },
+        '心斎橋': { lat: 34.6750, lng: 135.5010 },
+        '天王寺': { lat: 34.6465, lng: 135.5133 },
+        '福島': { lat: 34.6930, lng: 135.4830 },
+        '本町': { lat: 34.6810, lng: 135.4960 },
+        '淀屋橋': { lat: 34.6900, lng: 135.5020 },
+        '天満': { lat: 34.7055, lng: 135.5120 },
+        '京橋': { lat: 34.6970, lng: 135.5350 },
+        '西成': { lat: 34.6350, lng: 135.5050 },
+        '新大阪': { lat: 34.7330, lng: 135.5000 },
+        '十三': { lat: 34.7200, lng: 135.4750 },
+        '中之島': { lat: 34.6914, lng: 135.4946 },
+        'OBP': { lat: 34.6932, lng: 135.5199 },
+        '大阪城公園': { lat: 34.6873, lng: 135.5320 },
+        '天保山': { lat: 34.6545, lng: 135.4290 },
+        'USJ': { lat: 34.6654, lng: 135.4324 },
+        '京セラドーム': { lat: 34.6694, lng: 135.4762 },
+        '梅田スカイビル': { lat: 34.7052, lng: 135.4876 },
+        'インテックス': { lat: 34.6360, lng: 135.4190 },
+        '海遊館': { lat: 34.6545, lng: 135.4290 },
+        '阿倍野': { lat: 34.6460, lng: 135.5140 },
+        '堺筋本町': { lat: 34.6820, lng: 135.5050 },
+        '肥後橋': { lat: 34.6880, lng: 135.4920 },
+        '谷町': { lat: 34.6800, lng: 135.5180 },
+        '上本町': { lat: 34.6700, lng: 135.5250 },
+        '鶴橋': { lat: 34.6680, lng: 135.5300 },
+        '江坂': { lat: 34.7510, lng: 135.5000 },
+        '千里中央': { lat: 34.8070, lng: 135.4940 },
+        '豊中': { lat: 34.7810, lng: 135.4700 },
+        '吹田': { lat: 34.7640, lng: 135.5180 },
+        '箕面': { lat: 34.8270, lng: 135.4700 },
+        '伊丹空港': { lat: 34.7850, lng: 135.4380 }
+    };
+
+    const DAY_NAMES = ['日', '月', '火', '水', '木', '金', '土'];
+    const TIME_PERIOD_LABELS = {
+        '0-2': '深夜帯',
+        '2-4': '深夜帯',
+        '4-6': '早朝帯',
+        '6-8': '朝帯',
+        '8-10': '朝帯',
+        '10-12': '昼帯',
+        '12-14': '昼帯',
+        '14-16': '昼帯',
+        '16-18': '夕方帯',
+        '18-20': '夕方帯',
+        '20-22': '夜帯',
+        '22-24': '深夜帯'
+    };
 
     const LONG_RIDES = [
         { lat: 34.7010, lng: 135.4975, fare: 8200, from: '北新地', to: '箕面', time: '23:40', date: '2/5', app: 'uber' },
@@ -1018,13 +1177,35 @@
         if (h >= 17 && h < 22) return 'evening';
         return 'night';
     }
-    APP_PICKUPS.forEach(p => p.period = getPeriod(p.time));
     LONG_RIDES.forEach(r => r.period = getPeriod(r.time));
     const PERIOD_LABELS = { morning: '🌅 朝', day: '☀️ 昼', evening: '🌆 夜', night: '🌙 深夜' };
 
-    let appMap = null, appMarkers = [], appHeatLayer = null;
-    let appFilters = { view: 'pin', period: 'all', app: 'all' };
+    let appMap = null, hotspotLayers = [], currentLocationMarker = null;
+    let hotspotData = [];
 
+    // Get current time slot (2-hour window)
+    function getTimeSlot() {
+        const now = new Date();
+        const h = now.getHours();
+        const startHour = Math.floor(h / 2) * 2;
+        const endHour = startHour + 2;
+        return {
+            start: startHour,
+            end: endHour,
+            label: `${startHour}:00 〜 ${endHour === 24 ? '0' : endHour}:00`
+        };
+    }
+
+    // Get current day of week
+    function getDayOfWeek() {
+        const now = new Date();
+        return {
+            index: now.getDay(),
+            name: DAY_NAMES[now.getDay()]
+        };
+    }
+
+    // Initialize hotspot map
     function initAppMap() {
         if (appMap) return;
         appMap = L.map('map', { center: [34.6937, 135.5023], zoom: 12, zoomControl: false });
@@ -1032,57 +1213,256 @@
         L.tileLayer('https://tile.openstreetmap.jp/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap © CartoDB', maxZoom: 19
         }).addTo(appMap);
-        renderAppMap();
+        fetchHotspotData();
     }
 
-    function renderAppMap() {
-        if (!appMap) return;
-        appMarkers.forEach(m => appMap.removeLayer(m));
-        appMarkers = [];
-        if (appHeatLayer) { appMap.removeLayer(appHeatLayer); appHeatLayer = null; }
+    // Fetch hotspot data from Supabase
+    async function fetchHotspotData() {
+        const timeSlot = getTimeSlot();
+        const dayOfWeek = getDayOfWeek();
 
-        let filtered = APP_PICKUPS.filter(p => {
-            if (appFilters.period !== 'all' && p.period !== appFilters.period) return false;
-            if (appFilters.app !== 'all' && p.app !== appFilters.app) return false;
-            return true;
-        });
+        // Update UI
+        document.getElementById('hotspot-time-range').textContent = timeSlot.label;
+        document.getElementById('hotspot-day').textContent = dayOfWeek.name + '曜';
 
-        if (appFilters.view === 'pin') {
-            filtered.forEach(p => {
-                const icon = L.divIcon({ className: '', html: `<div class="app-dot ${p.app}"></div>`, iconSize: [14,14], iconAnchor: [7,7] });
-                const marker = L.marker([p.lat, p.lng], { icon }).addTo(appMap);
-                marker.bindPopup(`<div><div class="popup-tag ${p.app}">${p.app==='uber'?'Uber':'DiDi'}</div><div class="popup-tag ${p.period}">${PERIOD_LABELS[p.period]} ${p.time}</div><div class="popup-area">${p.area}</div><div class="popup-datetime">${p.date}</div><a href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lng}&travelmode=driving" target="_blank" class="popup-navi-btn">🚗 Google Mapsで行く</a></div>`);
-                appMarkers.push(marker);
-            });
-            document.getElementById('app-legend').innerHTML = `<div class="legend-title">配車アプリ</div><div class="legend-item"><div class="legend-dot uber"></div><span>Uber</span></div><div class="legend-item"><div class="legend-dot didi"></div><span>DiDi</span></div>`;
-        } else {
-            appHeatLayer = L.heatLayer(filtered.map(p => [p.lat, p.lng, 1]), { radius: 40, blur: 15, maxZoom: 17, minOpacity: 0.6, max: 1.0, gradient: { 0:'#0066ff', 0.3:'#00ccaa', 0.5:'#44dd00', 0.7:'#ffaa00', 0.85:'#ff4400', 1:'#cc0000' } }).addTo(appMap);
-            document.getElementById('app-legend').innerHTML = `<div class="legend-title">配車リクエスト密度</div><div class="legend-item"><div class="legend-gradient"></div></div>`;
+        if (!sb) {
+            renderHotspotMap([]);
+            return;
         }
 
-        const uc = filtered.filter(p => p.app==='uber').length, dc = filtered.filter(p => p.app==='didi').length;
-        document.getElementById('app-stats').innerHTML = `<div class="stats-label">アプリ配車（今月）</div><div class="stats-value">${filtered.length}</div><div class="stats-detail">Uber ${uc} / DiDi ${dc}</div>`;
+        try {
+            // Get all logs
+            const { data: logs } = await sb
+                .from('flow_taxi_logs')
+                .select('*')
+                .order('ride_date', { ascending: false });
+
+            if (!logs || logs.length === 0) {
+                renderHotspotMap([]);
+                return;
+            }
+
+            // Filter by day of week and time slot
+            const filtered = logs.filter(log => {
+                const logDate = new Date(log.ride_date);
+                if (logDate.getDay() !== dayOfWeek.index) return false;
+
+                if (log.ride_time) {
+                    const h = parseInt(log.ride_time.split(':')[0]);
+                    if (h < timeSlot.start || h >= timeSlot.end) return false;
+                }
+                return true;
+            });
+
+            hotspotData = filtered;
+            document.getElementById('hotspot-count').textContent = `過去の同条件 ${filtered.length}件`;
+            renderHotspotMap(filtered);
+        } catch (e) {
+            console.warn('fetchHotspotData error:', e);
+            renderHotspotMap([]);
+        }
     }
 
-    // App tab filters
-    document.querySelectorAll('#apps-content .toggle-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('#apps-content .toggle-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active'); appFilters.view = this.dataset.view; renderAppMap();
+    // Get coordinates for an area
+    function getAreaCoords(areaName) {
+        if (AREA_COORDS[areaName]) return AREA_COORDS[areaName];
+        // Try partial match
+        for (const key in AREA_COORDS) {
+            if (areaName.includes(key) || key.includes(areaName)) {
+                return AREA_COORDS[key];
+            }
+        }
+        return null;
+    }
+
+    // Render hotspot map
+    function renderHotspotMap(logs) {
+        if (!appMap) return;
+
+        // Clear existing layers
+        hotspotLayers.forEach(l => appMap.removeLayer(l));
+        hotspotLayers = [];
+
+        if (!logs || logs.length === 0) {
+            // Show empty state
+            document.getElementById('hotspot-recommend').style.display = 'none';
+            document.getElementById('hotspot-insight').style.display = 'none';
+            return;
+        }
+
+        // Group by area
+        const areaGroups = {};
+        logs.forEach(log => {
+            const area = log.area || '不明';
+            if (!areaGroups[area]) areaGroups[area] = [];
+            areaGroups[area].push(log);
         });
-    });
-    document.querySelectorAll('#apps-content .filter-btn[data-period]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('#apps-content .filter-btn[data-period]').forEach(b => b.classList.remove('active'));
-            this.classList.add('active'); appFilters.period = this.dataset.period; renderAppMap();
+
+        // Sort areas by count
+        const sortedAreas = Object.entries(areaGroups)
+            .sort((a, b) => b[1].length - a[1].length);
+
+        // Draw circles for each area
+        sortedAreas.forEach(([area, areaLogs]) => {
+            const coords = getAreaCoords(area);
+            if (!coords) return;
+
+            const count = areaLogs.length;
+            let radius, color, opacity, borderColor;
+
+            if (count >= 3) {
+                radius = 300;
+                color = '#00e676';
+                opacity = 0.25;
+                borderColor = '#00e676';
+            } else if (count === 2) {
+                radius = 200;
+                color = '#ffb74d';
+                opacity = 0.2;
+                borderColor = '#ffb74d';
+            } else {
+                radius = 150;
+                color = '#ffffff';
+                opacity = 0.1;
+                borderColor = 'rgba(255,255,255,0.4)';
+            }
+
+            // Draw circle
+            const circle = L.circle([coords.lat, coords.lng], {
+                radius: radius,
+                fillColor: color,
+                fillOpacity: opacity,
+                color: borderColor,
+                weight: 2
+            }).addTo(appMap);
+            hotspotLayers.push(circle);
+
+            // Add count label
+            const countIcon = L.divIcon({
+                className: '',
+                html: `<div class="hotspot-circle-label">${count}</div>`,
+                iconSize: [30, 20],
+                iconAnchor: [15, 10]
+            });
+            const countMarker = L.marker([coords.lat, coords.lng], { icon: countIcon }).addTo(appMap);
+            hotspotLayers.push(countMarker);
+
+            // Add area label below
+            const labelIcon = L.divIcon({
+                className: '',
+                html: `<div class="hotspot-area-label">${area}</div>`,
+                iconSize: [80, 16],
+                iconAnchor: [40, -5]
+            });
+            const labelMarker = L.marker([coords.lat, coords.lng], { icon: labelIcon }).addTo(appMap);
+            hotspotLayers.push(labelMarker);
         });
-    });
-    document.querySelectorAll('#apps-content .filter-btn[data-app]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('#apps-content .filter-btn[data-app]').forEach(b => b.classList.remove('active'));
-            this.classList.add('active'); appFilters.app = this.dataset.app; renderAppMap();
+
+        // Update recommend card
+        if (sortedAreas.length > 0) {
+            const [topArea, topLogs] = sortedAreas[0];
+            const timeSlot = getTimeSlot();
+            document.getElementById('hotspot-recommend').style.display = 'block';
+            document.getElementById('hotspot-recommend-area').textContent = topArea;
+            document.getElementById('hotspot-recommend-detail').textContent = `${topLogs.length}件 / ${timeSlot.label}`;
+        } else {
+            document.getElementById('hotspot-recommend').style.display = 'none';
+        }
+
+        // Generate insight
+        generateInsight(logs, sortedAreas);
+    }
+
+    // Generate insight text
+    function generateInsight(logs, sortedAreas) {
+        if (!logs || logs.length === 0 || sortedAreas.length === 0) {
+            document.getElementById('hotspot-insight').style.display = 'none';
+            return;
+        }
+
+        const dayOfWeek = getDayOfWeek();
+        const timeSlot = getTimeSlot();
+        const timePeriodKey = `${timeSlot.start}-${timeSlot.end}`;
+        const periodLabel = TIME_PERIOD_LABELS[timePeriodKey] || '時間帯';
+
+        // Top area
+        const [topArea, topLogs] = sortedAreas[0];
+
+        // App breakdown
+        const appCounts = { nagashi: 0, uber: 0, didi: 0 };
+        let totalFare = 0;
+        logs.forEach(log => {
+            if (log.app && appCounts.hasOwnProperty(log.app)) {
+                appCounts[log.app]++;
+            }
+            if (log.fare) totalFare += log.fare;
         });
-    });
+
+        const avgFare = logs.length > 0 ? Math.round(totalFare / logs.length) : 0;
+        const totalApps = appCounts.nagashi + appCounts.uber + appCounts.didi;
+
+        // Build insight text
+        let text = `${dayOfWeek.name}曜の${periodLabel}は`;
+
+        if (sortedAreas.length > 1) {
+            text += `${topArea}・${sortedAreas[1][0]}エリアで乗車が集中。`;
+        } else {
+            text += `${topArea}エリアで乗車が集中。`;
+        }
+
+        if (totalApps > 0) {
+            const parts = [];
+            if (appCounts.nagashi > 0) parts.push(`流し${appCounts.nagashi}件`);
+            if (appCounts.uber > 0) parts.push(`Uber${appCounts.uber}件`);
+            if (appCounts.didi > 0) parts.push(`DiDi${appCounts.didi}件`);
+            text += `過去${logs.length}件中、${parts.join('/')}`;
+        }
+
+        if (avgFare > 0) {
+            text += `、平均単価¥${avgFare.toLocaleString()}`;
+        }
+
+        document.getElementById('hotspot-insight').style.display = 'block';
+        document.getElementById('hotspot-insight-text').textContent = text;
+    }
+
+    // Go to current location
+    function goToCurrentLocation() {
+        if (!navigator.geolocation) {
+            alert('位置情報がサポートされていません');
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                if (appMap) {
+                    appMap.setView([lat, lng], 14);
+
+                    // Remove existing marker
+                    if (currentLocationMarker) {
+                        appMap.removeLayer(currentLocationMarker);
+                    }
+
+                    // Add current location marker
+                    const icon = L.divIcon({
+                        className: '',
+                        html: '<div class="current-location-marker"></div>',
+                        iconSize: [22, 22],
+                        iconAnchor: [11, 11]
+                    });
+                    currentLocationMarker = L.marker([lat, lng], { icon }).addTo(appMap);
+                }
+            },
+            (error) => {
+                console.warn('Geolocation error:', error);
+                alert('位置情報を取得できませんでした');
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
 
     // ========================================
     // LONG TAB - Map
