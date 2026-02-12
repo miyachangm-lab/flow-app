@@ -1631,35 +1631,82 @@
 
     document.getElementById('addEventBtn').addEventListener('click', async () => {
         if (!parsedEvent) return;
+
+        const btn = document.getElementById('addEventBtn');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '保存中...';
+
         const newEvent = {
             venue: parsedEvent.venueFull, type: parsedEvent.category, rank: parsedEvent.rank,
             endTime: parsedEvent.endTime || '21:00', label: '終了予定', people: parsedEvent.count,
             artist: null, detail: null, startTime: null, memo: null, source: 'manual'
         };
 
+        let saveSuccess = false;
+
         // Save to Supabase
         if (sb) {
             try {
                 const today = new Date().toISOString().split('T')[0];
-                await sb.from('flow_manual_events').insert([{
+                const { error } = await sb.from('flow_manual_events').insert([{
                     event_date: today, venue: newEvent.venue, detail: newEvent.detail || '',
                     event_type: newEvent.type, rank: newEvent.rank, end_time: newEvent.endTime,
                     people_count: newEvent.people || null
                 }]);
-            } catch (e) { console.warn('Save failed:', e); }
+
+                if (error) {
+                    console.warn('Save failed:', error);
+                    btn.textContent = '❌ 保存に失敗しました';
+                    btn.style.background = '#ef4444';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                    }, 2000);
+                    return;
+                }
+
+                saveSuccess = true;
+                console.log('✅ Event saved to Supabase');
+            } catch (e) {
+                console.warn('Save failed:', e);
+                btn.textContent = '❌ 保存に失敗しました';
+                btn.style.background = '#ef4444';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                    btn.disabled = false;
+                }, 2000);
+                return;
+            }
+        } else {
+            // Supabase未接続の場合はローカルのみ
+            saveSuccess = true;
         }
+
+        // Show success feedback
+        btn.textContent = '✅ 保存しました';
+        btn.style.background = '#22c55e';
 
         EVENTS.push(newEvent);
         renderTimeline();
         updateNextBanner(EVENTS);
-        closeLineModal();
 
-        // Switch to events tab
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-        document.querySelector('.tab[data-tab="events"]').classList.add('active');
-        document.getElementById('events-content').classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Close modal after brief delay to show success message
+        setTimeout(() => {
+            closeLineModal();
+            btn.textContent = originalText;
+            btn.style.background = '';
+            btn.disabled = false;
+
+            // Switch to events tab
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.querySelector('.tab[data-tab="events"]').classList.add('active');
+            document.getElementById('events-content').classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 1000);
     });
 
     // ========================================
