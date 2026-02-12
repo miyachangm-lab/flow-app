@@ -534,6 +534,189 @@
             0%, 100% { box-shadow: 0 0 0 2px rgba(66,133,244,0.3), 0 2px 8px rgba(0,0,0,0.3); }
             50% { box-shadow: 0 0 0 8px rgba(66,133,244,0.15), 0 2px 8px rgba(0,0,0,0.3); }
         }
+
+        /* Navi Tab Styles */
+        .navi-filter-bar {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 16px; background: var(--navy-light);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .navi-toggle-btn {
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+            border: 1.5px solid transparent;
+            background: rgba(255,255,255,0.05);
+            color: var(--gray-400);
+        }
+        .navi-toggle-btn.active { opacity: 1; }
+        .navi-toggle-btn.inactive { opacity: 0.4; }
+        .navi-toggle-btn.event { border-color: #ff9800; color: #ff9800; background: rgba(255,152,0,0.1); }
+        .navi-toggle-btn.hotel { border-color: #ce93d8; color: #ce93d8; background: rgba(156,39,176,0.1); }
+        .navi-toggle-btn.long { border-color: #64b5f6; color: #64b5f6; background: rgba(33,150,243,0.1); }
+        .navi-pulse-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #ff9800;
+            animation: naviPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes naviPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+        .navi-legend {
+            position: absolute; bottom: 20px; left: 16px; z-index: 1000;
+            background: rgba(10,10,20,0.88); backdrop-filter: blur(12px);
+            border-radius: 10px; padding: 12px 14px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .navi-legend-title {
+            font-size: 10px; color: var(--gray-400); text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 8px; font-weight: 600;
+        }
+        .navi-legend-item {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 5px; font-size: 10px; color: var(--gray-300);
+        }
+        .navi-legend-item:last-child { margin-bottom: 0; }
+        .navi-legend-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+        .navi-legend-dot.urgent { background: #ff1744; border-color: #ff1744; }
+        .navi-legend-dot.soon { background: #ff9800; border-color: #ff9800; }
+        .navi-legend-dot.hotel { background: #9c27b0; border-color: #9c27b0; }
+        .navi-legend-dot.long { background: #2196f3; border-color: #2196f3; }
+        .navi-location-btn {
+            position: absolute; bottom: 20px; right: 16px; z-index: 1000;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(10,10,20,0.88); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .navi-location-btn:active { transform: scale(0.95); }
+        .navi-location-btn svg { width: 22px; height: 22px; }
+        .navi-recommend {
+            background: var(--navy-light);
+            border: 1px solid rgba(255,152,0,0.4);
+            border-radius: 12px; padding: 14px 16px;
+            margin: 12px 16px;
+        }
+        .navi-recommend-header {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; color: #ff9800; font-weight: 600; margin-bottom: 8px;
+        }
+        .navi-recommend-text {
+            font-size: 13px; color: var(--gray-300); line-height: 1.6;
+        }
+        .navi-recommend-venue {
+            font-size: 16px; font-weight: 700; color: white; margin-bottom: 4px;
+        }
+        .navi-recommend-detail {
+            font-size: 12px; color: var(--gray-400);
+        }
+        .navi-subtabs {
+            display: flex; gap: 0; margin: 0 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .navi-subtab {
+            flex: 1; padding: 12px; text-align: center;
+            font-size: 13px; font-weight: 600; color: var(--gray-400);
+            cursor: pointer; border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .navi-subtab.active { color: white; border-bottom-color: #ff9800; }
+        .navi-subtab.hotel-long.active { border-bottom-color: #9c27b0; }
+        .navi-list {
+            padding: 12px 16px; display: flex; flex-direction: column; gap: 10px;
+        }
+        .navi-list-item {
+            display: flex; align-items: center; gap: 12px;
+            background: var(--navy-light); border-radius: 12px;
+            padding: 14px; border-left: 4px solid var(--gray-700);
+        }
+        .navi-list-item.urgent { border-left-color: #ff1744; background: linear-gradient(90deg, rgba(255,23,68,0.1) 0%, var(--navy-light) 100%); }
+        .navi-list-item.soon { border-left-color: #ff9800; background: linear-gradient(90deg, rgba(255,152,0,0.08) 0%, var(--navy-light) 100%); }
+        .navi-list-item.hotel { border-left-color: #9c27b0; }
+        .navi-list-item.long { border-left-color: #2196f3; }
+        .navi-countdown {
+            width: 60px; flex-shrink: 0; text-align: center;
+        }
+        .navi-countdown-num {
+            font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 900;
+            line-height: 1;
+        }
+        .navi-countdown-num.urgent { color: #ff1744; }
+        .navi-countdown-num.soon { color: #ff9800; }
+        .navi-countdown-num.normal { color: var(--gray-500); }
+        .navi-countdown-label {
+            font-size: 10px; color: var(--gray-400); margin-top: 2px;
+        }
+        .navi-countdown-time {
+            font-size: 10px; color: var(--gray-500); margin-top: 2px;
+        }
+        .navi-icon-block {
+            width: 48px; height: 48px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+        }
+        .navi-icon-block.hotel { background: rgba(156,39,176,0.2); }
+        .navi-icon-block.long { background: rgba(33,150,243,0.2); }
+        .navi-info { flex: 1; min-width: 0; }
+        .navi-info-venue {
+            font-size: 14px; font-weight: 700; color: white;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .navi-info-detail {
+            font-size: 11px; color: var(--gray-400); margin-top: 2px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .navi-info-tags {
+            display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;
+        }
+        .navi-tag {
+            font-size: 10px; padding: 3px 8px; border-radius: 10px;
+            background: rgba(255,255,255,0.08); color: var(--gray-400);
+        }
+        .navi-btn {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: #00e676; border: none;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0; transition: all 0.2s;
+        }
+        .navi-btn:active { transform: scale(0.95); }
+        .navi-btn svg { width: 20px; height: 20px; fill: white; }
+        .navi-event-marker {
+            padding: 4px 10px; border-radius: 16px;
+            font-size: 11px; font-weight: 700; color: white;
+            white-space: nowrap; display: flex; align-items: center; gap: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .navi-event-marker.urgent { background: #ff1744; }
+        .navi-event-marker.soon { background: #ff9800; }
+        .navi-event-marker.later { background: rgba(100,100,100,0.8); }
+        .navi-hotel-marker {
+            padding: 4px 10px; border-radius: 16px;
+            font-size: 11px; font-weight: 700; color: white;
+            background: #9c27b0; white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .navi-long-marker {
+            padding: 4px 10px; border-radius: 16px;
+            font-size: 11px; font-weight: 700; color: white;
+            background: #2196f3; white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        @keyframes naviUrgentPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,23,68,0.5); }
+            50% { box-shadow: 0 0 0 12px rgba(255,23,68,0); }
+        }
+        .navi-event-marker.urgent { animation: naviUrgentPulse 1.5s ease-out infinite; }
+        .navi-empty {
+            text-align: center; padding: 30px 20px; color: var(--gray-400);
+        }
+        .navi-empty-text { font-size: 13px; }
     </style>
 </head>
 
@@ -551,7 +734,7 @@
     <div class="tab-bar">
         <div class="tab active" data-tab="events"><span class="tab-icon">📅</span>イベント</div>
         <div class="tab" data-tab="apps"><span class="tab-icon">🔥</span>スポット</div>
-        <div class="tab" data-tab="long"><span class="tab-icon">🗺</span>ロング</div>
+        <div class="tab" data-tab="long"><span class="tab-icon">🧭</span>ナビ</div>
         <div class="tab" data-tab="dashboard"><span class="tab-icon">📊</span>収益</div>
     </div>
 
@@ -617,44 +800,53 @@
         </div>
     </div>
 
-    <!-- Long Tab Content -->
+    <!-- Navi Tab Content -->
     <div class="content" id="long-content">
-        <div class="map-container">
-            <div class="filter-toggle-bar" onclick="toggleFilter(this)">🔧 フィルター <span class="arrow">▼</span></div>
-            <div class="map-filters" id="long-filters">
-                <div class="filter-section">
-                    <div class="filter-label">表示切替</div>
-                    <div class="toggle-group">
-                        <button class="toggle-btn active" data-view="pin">📍 ピン表示</button>
-                        <button class="toggle-btn" data-view="heat">🔥 ヒートマップ</button>
-                    </div>
-                </div>
-                <div class="filter-section">
-                    <div class="filter-label">時間帯</div>
-                    <div class="filter-group">
-                        <button class="filter-btn active" data-period="all">全て</button>
-                        <button class="filter-btn" data-period="morning">🌅 朝</button>
-                        <button class="filter-btn" data-period="day">☀️ 昼</button>
-                        <button class="filter-btn" data-period="evening">🌆 夜</button>
-                        <button class="filter-btn" data-period="night">🌙 深夜</button>
-                    </div>
-                </div>
-                <div class="filter-section">
-                    <div class="filter-label">金額</div>
-                    <div class="filter-group">
-                        <button class="filter-btn active" data-fare="all">全て</button>
-                        <button class="filter-btn" data-fare="3000">¥3,000+</button>
-                        <button class="filter-btn" data-fare="5000">¥5,000+</button>
-                        <button class="filter-btn" data-fare="8000">¥8,000+</button>
-                    </div>
-                </div>
+        <div class="map-container" style="height: auto; min-height: unset;">
+            <div class="navi-filter-bar">
+                <button class="navi-toggle-btn event active" id="navi-toggle-event" onclick="toggleNaviFilter('event')">
+                    <div class="navi-pulse-dot"></div>
+                    <span>イベント</span>
+                </button>
+                <button class="navi-toggle-btn hotel active" id="navi-toggle-hotel" onclick="toggleNaviFilter('hotel')">
+                    <span>🏨 ホテル</span>
+                </button>
+                <button class="navi-toggle-btn long active" id="navi-toggle-long" onclick="toggleNaviFilter('long')">
+                    <span>💰 ロング</span>
+                </button>
             </div>
-            <div style="position: relative; flex: 1;">
+            <div style="position: relative; height: 280px;">
                 <div id="long-map"></div>
-                <div class="map-legend" id="long-legend"></div>
-                <div class="map-stats" id="long-stats"></div>
+                <div class="navi-legend">
+                    <div class="navi-legend-title">マーカー</div>
+                    <div class="navi-legend-item"><div class="navi-legend-dot urgent"></div><span>終了30分以内</span></div>
+                    <div class="navi-legend-item"><div class="navi-legend-dot soon"></div><span>終了30〜60分</span></div>
+                    <div class="navi-legend-item"><div class="navi-legend-dot hotel"></div><span>ホテル</span></div>
+                    <div class="navi-legend-item"><div class="navi-legend-dot long"></div><span>ロングスポット</span></div>
+                </div>
+                <div class="navi-location-btn" onclick="goToNaviCurrentLocation()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#4285f4" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <line x1="12" y1="2" x2="12" y2="6"/>
+                        <line x1="12" y1="18" x2="12" y2="22"/>
+                        <line x1="2" y1="12" x2="6" y2="12"/>
+                        <line x1="18" y1="12" x2="22" y2="12"/>
+                    </svg>
+                </div>
             </div>
         </div>
+        <div class="navi-recommend" id="navi-recommend">
+            <div class="navi-recommend-header">🎯 おすすめ待機</div>
+            <div class="navi-recommend-venue" id="navi-recommend-venue">--</div>
+            <div class="navi-recommend-detail" id="navi-recommend-detail">--</div>
+            <div class="navi-recommend-text" id="navi-recommend-text"></div>
+        </div>
+        <div class="navi-subtabs">
+            <div class="navi-subtab active" id="navi-subtab-event" onclick="switchNaviSubtab('event')">🔴 イベント</div>
+            <div class="navi-subtab hotel-long" id="navi-subtab-hotel" onclick="switchNaviSubtab('hotel')">🟣 ホテル・ロング</div>
+        </div>
+        <div class="navi-list" id="navi-list-event"></div>
+        <div class="navi-list" id="navi-list-hotel" style="display: none;"></div>
     </div>
 
     <!-- Dashboard Tab Content -->
@@ -1471,78 +1663,400 @@
     }
 
     // ========================================
-    // LONG TAB - Map
+    // NAVI TAB - Map with Events, Hotels, Long Spots
     // ========================================
-    let longMap = null, longMarkers = [], longHeatLayer = null;
-    let longFilters = { view: 'pin', period: 'all', fare: 'all' };
+    let longMap = null, naviMarkers = [], naviCurrentLocation = null;
+    let naviFilters = { event: true, hotel: true, long: true };
+    let naviEvents = [];
+    let naviSubtab = 'event';
+    let naviUpdateInterval = null;
+
+    // Hotel data for navi tab
+    const NAVI_HOTELS = [
+        { lat: 34.6932, lng: 135.5199, name: 'ニューオータニ', checkout: '11:00', rooms: 525, avgFare: 4500 },
+        { lat: 34.6905, lng: 135.4849, name: 'リーガロイヤル', checkout: '11:00', rooms: 1039, avgFare: 5200 },
+        { lat: 34.6965, lng: 135.4897, name: '帝国ホテル', checkout: '12:00', rooms: 381, avgFare: 6800 },
+        { lat: 34.7005, lng: 135.4955, name: 'インターコンチネンタル', checkout: '11:00', rooms: 272, avgFare: 5500 },
+        { lat: 34.6988, lng: 135.4903, name: 'ウェスティン大阪', checkout: '12:00', rooms: 303, avgFare: 5000 }
+    ];
+
+    // Long spot data for navi tab
+    const NAVI_LONG_SPOTS = [
+        { lat: 34.7025, lng: 135.4950, name: '北新地', desc: '終電後/繁華街', avgFare: 7500, freq: '高' },
+        { lat: 34.6650, lng: 135.5015, name: '難波', desc: '繁華街/観光地', avgFare: 4500, freq: '高' },
+        { lat: 34.7010, lng: 135.4975, name: '梅田', desc: '駅周辺/ビジネス', avgFare: 5000, freq: '中' },
+        { lat: 34.6654, lng: 135.4324, name: 'USJ', desc: '閉園後', avgFare: 5500, freq: '中' },
+        { lat: 34.6873, lng: 135.5320, name: '大阪城公園', desc: 'イベント後', avgFare: 4800, freq: '低' }
+    ];
 
     function initLongMap() {
         if (longMap) return;
-        longMap = L.map('long-map', { center: [34.6937, 135.5023], zoom: 12, zoomControl: false });
-        L.control.zoom({ position: 'bottomright' }).addTo(longMap);
+        longMap = L.map('long-map', { center: [34.6937, 135.5023], zoom: 13, zoomControl: false });
+        L.control.zoom({ position: 'topright' }).addTo(longMap);
         L.tileLayer('https://tile.openstreetmap.jp/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap © CartoDB', maxZoom: 19
         }).addTo(longMap);
-        renderLongMap();
+        fetchNaviEvents();
+        // Update every minute
+        if (naviUpdateInterval) clearInterval(naviUpdateInterval);
+        naviUpdateInterval = setInterval(() => {
+            if (document.getElementById('long-content').classList.contains('active')) {
+                renderNaviMap();
+                renderNaviList();
+            }
+        }, 60000);
     }
 
-    function renderLongMap() {
-        if (!longMap) return;
-        longMarkers.forEach(m => longMap.removeLayer(m));
-        longMarkers = [];
-        if (longHeatLayer) { longMap.removeLayer(longHeatLayer); longHeatLayer = null; }
+    // Fetch today's events from Supabase
+    async function fetchNaviEvents() {
+        naviEvents = [];
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
 
-        let filtered = LONG_RIDES.filter(r => {
-            if (longFilters.period !== 'all' && r.period !== longFilters.period) return false;
-            if (longFilters.fare !== 'all' && r.fare < parseInt(longFilters.fare)) return false;
-            return true;
-        });
+        if (sb) {
+            try {
+                // Fetch from flow_events
+                const { data: events } = await sb
+                    .from('flow_events')
+                    .select('*')
+                    .eq('event_date', today);
 
-        if (longFilters.view === 'pin') {
-            VENUES.forEach(v => {
-                const short = v.name.replace('📍 ', '').replace('📍🏨 ', '🏨');
-                const icon = L.divIcon({ className: '', html: `<div class="venue-pin ${v.type}">${short}</div>`, iconSize: [80,20], iconAnchor: [40,10] });
-                const marker = L.marker([v.lat, v.lng], { icon }).addTo(longMap);
-                marker.bindPopup(`<div><div class="popup-area">${v.name}</div><a href="https://www.google.com/maps/dir/?api=1&destination=${v.lat},${v.lng}&travelmode=driving" target="_blank" class="popup-navi-btn">🚗 Google Mapsで行く</a></div>`);
-                longMarkers.push(marker);
-            });
-            filtered.forEach(r => {
-                const fc = r.fare >= 5000 ? 'high' : 'medium';
-                const icon = L.divIcon({ className: '', html: `<div class="app-dot ${fc}"></div>`, iconSize: [14,14], iconAnchor: [7,7] });
-                const marker = L.marker([r.lat, r.lng], { icon }).addTo(longMap);
-                marker.bindPopup(`<div><div class="popup-tag ${r.period}">${PERIOD_LABELS[r.period]} ${r.time}</div><div class="popup-route">${r.from} → ${r.to}</div><div class="popup-fare ${fc}">¥${r.fare.toLocaleString()}</div><div class="popup-datetime">${r.date}</div><a href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}&travelmode=driving" target="_blank" class="popup-navi-btn">🚗 Google Mapsで行く</a></div>`);
-                longMarkers.push(marker);
-            });
-            document.getElementById('long-legend').innerHTML = `<div class="legend-title">ロング乗車</div><div class="legend-item"><div class="legend-box high"></div><span>¥5,000以上</span></div><div class="legend-item"><div class="legend-box medium"></div><span>¥3,000〜4,999</span></div><div class="legend-item"><div class="legend-box venue"></div><span>イベント会場</span></div><div class="legend-item"><div class="legend-box hotel"></div><span>ホテル</span></div>`;
-        } else {
-            longHeatLayer = L.heatLayer(filtered.map(r => [r.lat, r.lng, r.fare/10000]), { radius: 45, blur: 15, maxZoom: 17, minOpacity: 0.6, max: 1.0, gradient: { 0:'#0066ff', 0.3:'#00ccaa', 0.5:'#44dd00', 0.7:'#ffaa00', 0.85:'#ff4400', 1:'#cc0000' } }).addTo(longMap);
-            document.getElementById('long-legend').innerHTML = `<div class="legend-title">ロング発生密度</div><div class="legend-item"><div class="legend-gradient"></div></div>`;
+                // Fetch from flow_manual_events
+                const { data: manualEvents } = await sb
+                    .from('flow_manual_events')
+                    .select('*')
+                    .eq('event_date', today);
+
+                if (events) {
+                    events.forEach(e => {
+                        if (e.end_time) {
+                            naviEvents.push({
+                                venue: e.venue,
+                                artist: e.artist || e.event_name || '',
+                                endTime: e.end_time,
+                                people: e.capacity || e.people || 0,
+                                lat: VENUE_COORDS[e.venue]?.lat || AREA_COORDS[e.venue]?.lat,
+                                lng: VENUE_COORDS[e.venue]?.lng || AREA_COORDS[e.venue]?.lng
+                            });
+                        }
+                    });
+                }
+
+                if (manualEvents) {
+                    manualEvents.forEach(e => {
+                        if (e.end_time) {
+                            naviEvents.push({
+                                venue: e.venue,
+                                artist: e.artist || e.event_name || '',
+                                endTime: e.end_time,
+                                people: e.capacity || e.people || 0,
+                                lat: VENUE_COORDS[e.venue]?.lat || AREA_COORDS[e.venue]?.lat,
+                                lng: VENUE_COORDS[e.venue]?.lng || AREA_COORDS[e.venue]?.lng
+                            });
+                        }
+                    });
+                }
+            } catch (e) {
+                console.warn('fetchNaviEvents error:', e);
+            }
         }
 
-        const total = filtered.reduce((s, r) => s + r.fare, 0);
-        const avg = filtered.length > 0 ? Math.round(total / filtered.length) : 0;
-        document.getElementById('long-stats').innerHTML = `<div class="stats-label">ロング合計（今月）</div><div class="stats-value">¥${(total/1000).toFixed(0)}k</div><div class="stats-detail">${filtered.length}件 / 平均 ¥${avg.toLocaleString()}</div>`;
+        // Also use EVENTS from events tab if available
+        if (EVENTS && EVENTS.length > 0) {
+            EVENTS.forEach(e => {
+                if (e.endTime && !naviEvents.find(n => n.venue === e.venue && n.endTime === e.endTime)) {
+                    const coords = VENUE_COORDS[e.venue] || AREA_COORDS[e.venue];
+                    if (coords) {
+                        naviEvents.push({
+                            venue: e.venue,
+                            artist: e.artist || '',
+                            endTime: e.endTime,
+                            people: e.people || 0,
+                            lat: coords.lat,
+                            lng: coords.lng
+                        });
+                    }
+                }
+            });
+        }
+
+        renderNaviMap();
+        renderNaviList();
+        updateNaviRecommend();
     }
 
-    // Long tab filters
-    document.querySelectorAll('#long-content .toggle-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('#long-content .toggle-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active'); longFilters.view = this.dataset.view; renderLongMap();
+    // Get remaining minutes until event end
+    function getEventMinutesRemaining(endTime) {
+        const now = new Date();
+        const [h, m] = endTime.split(':').map(Number);
+        const endDate = new Date();
+        endDate.setHours(h, m, 0, 0);
+        const diff = (endDate - now) / 1000 / 60;
+        return Math.round(diff);
+    }
+
+    // Toggle navi filter
+    function toggleNaviFilter(type) {
+        naviFilters[type] = !naviFilters[type];
+        const btn = document.getElementById(`navi-toggle-${type}`);
+        if (btn) {
+            btn.classList.toggle('active', naviFilters[type]);
+            btn.classList.toggle('inactive', !naviFilters[type]);
+        }
+        renderNaviMap();
+    }
+
+    // Render navi map markers
+    function renderNaviMap() {
+        if (!longMap) return;
+
+        // Clear existing markers
+        naviMarkers.forEach(m => longMap.removeLayer(m));
+        naviMarkers = [];
+
+        const now = new Date();
+
+        // Event markers
+        if (naviFilters.event) {
+            naviEvents.forEach(e => {
+                if (!e.lat || !e.lng) return;
+                const mins = getEventMinutesRemaining(e.endTime);
+                if (mins < 0) return; // Already ended
+
+                let markerClass = 'later';
+                if (mins <= 30) markerClass = 'urgent';
+                else if (mins <= 60) markerClass = 'soon';
+
+                const label = mins <= 60 ? `⏰ ${mins}分 ${e.venue}` : `${e.venue}`;
+                const icon = L.divIcon({
+                    className: '',
+                    html: `<div class="navi-event-marker ${markerClass}">${label}</div>`,
+                    iconSize: [120, 24],
+                    iconAnchor: [60, 12]
+                });
+                const marker = L.marker([e.lat, e.lng], { icon }).addTo(longMap);
+                marker.bindPopup(`<div><div class="popup-area">${e.venue}</div><div class="popup-datetime">${e.artist}</div><div class="popup-datetime">終了: ${e.endTime} (${mins}分後)</div><a href="https://www.google.com/maps/dir/?api=1&destination=${e.lat},${e.lng}&travelmode=driving" target="_blank" class="popup-navi-btn">🚗 ナビで行く</a></div>`);
+                naviMarkers.push(marker);
+            });
+        }
+
+        // Hotel markers
+        if (naviFilters.hotel) {
+            NAVI_HOTELS.forEach(h => {
+                const icon = L.divIcon({
+                    className: '',
+                    html: `<div class="navi-hotel-marker">🏨 ${h.name}</div>`,
+                    iconSize: [100, 24],
+                    iconAnchor: [50, 12]
+                });
+                const marker = L.marker([h.lat, h.lng], { icon }).addTo(longMap);
+                marker.bindPopup(`<div><div class="popup-area">🏨 ${h.name}</div><div class="popup-datetime">C/O ${h.checkout} / ${h.rooms}室</div><div class="popup-datetime">平均 ¥${h.avgFare.toLocaleString()}</div><a href="https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}&travelmode=driving" target="_blank" class="popup-navi-btn">🚗 ナビで行く</a></div>`);
+                naviMarkers.push(marker);
+            });
+        }
+
+        // Long spot markers
+        if (naviFilters.long) {
+            NAVI_LONG_SPOTS.forEach(s => {
+                const icon = L.divIcon({
+                    className: '',
+                    html: `<div class="navi-long-marker">💰 ${s.name}</div>`,
+                    iconSize: [100, 24],
+                    iconAnchor: [50, 12]
+                });
+                const marker = L.marker([s.lat, s.lng], { icon }).addTo(longMap);
+                marker.bindPopup(`<div><div class="popup-area">💰 ${s.name}</div><div class="popup-datetime">${s.desc}</div><div class="popup-datetime">平均 ¥${s.avgFare.toLocaleString()} / 頻度: ${s.freq}</div><a href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=driving" target="_blank" class="popup-navi-btn">🚗 ナビで行く</a></div>`);
+                naviMarkers.push(marker);
+            });
+        }
+    }
+
+    // Switch navi subtab
+    function switchNaviSubtab(tab) {
+        naviSubtab = tab;
+        document.getElementById('navi-subtab-event').classList.toggle('active', tab === 'event');
+        document.getElementById('navi-subtab-hotel').classList.toggle('active', tab === 'hotel');
+        document.getElementById('navi-list-event').style.display = tab === 'event' ? 'flex' : 'none';
+        document.getElementById('navi-list-hotel').style.display = tab === 'hotel' ? 'flex' : 'none';
+    }
+
+    // Render navi list
+    function renderNaviList() {
+        renderNaviEventList();
+        renderNaviHotelList();
+    }
+
+    // Render event list
+    function renderNaviEventList() {
+        const container = document.getElementById('navi-list-event');
+        if (!container) return;
+
+        // Filter and sort events by remaining time
+        const activeEvents = naviEvents
+            .map(e => ({ ...e, mins: getEventMinutesRemaining(e.endTime) }))
+            .filter(e => e.mins >= 0)
+            .sort((a, b) => a.mins - b.mins);
+
+        if (activeEvents.length === 0) {
+            container.innerHTML = '<div class="navi-empty"><div class="navi-empty-text">現在開催中のイベントはありません</div></div>';
+            return;
+        }
+
+        let html = '';
+        activeEvents.forEach(e => {
+            let itemClass = '';
+            let numClass = 'normal';
+            if (e.mins <= 30) { itemClass = 'urgent'; numClass = 'urgent'; }
+            else if (e.mins <= 60) { itemClass = 'soon'; numClass = 'soon'; }
+
+            html += `
+                <div class="navi-list-item ${itemClass}">
+                    <div class="navi-countdown">
+                        <div class="navi-countdown-num ${numClass}">${e.mins}</div>
+                        <div class="navi-countdown-label">分後</div>
+                        <div class="navi-countdown-time">${e.endTime}終了</div>
+                    </div>
+                    <div class="navi-info">
+                        <div class="navi-info-venue">${e.venue}</div>
+                        <div class="navi-info-detail">${e.artist || ''}</div>
+                        <div class="navi-info-tags">
+                            ${e.people ? `<span class="navi-tag">👥 ${e.people.toLocaleString()}人</span>` : ''}
+                        </div>
+                    </div>
+                    <button class="navi-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${e.lat},${e.lng}&travelmode=driving')">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                    </button>
+                </div>
+            `;
         });
-    });
-    document.querySelectorAll('#long-content .filter-btn[data-period]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('#long-content .filter-btn[data-period]').forEach(b => b.classList.remove('active'));
-            this.classList.add('active'); longFilters.period = this.dataset.period; renderLongMap();
+
+        container.innerHTML = html;
+    }
+
+    // Render hotel/long list
+    function renderNaviHotelList() {
+        const container = document.getElementById('navi-list-hotel');
+        if (!container) return;
+
+        let html = '';
+
+        // Hotels
+        NAVI_HOTELS.forEach(h => {
+            html += `
+                <div class="navi-list-item hotel">
+                    <div class="navi-icon-block hotel">🏨</div>
+                    <div class="navi-info">
+                        <div class="navi-info-venue">${h.name}</div>
+                        <div class="navi-info-detail">C/O ${h.checkout} / ${h.rooms}室</div>
+                        <div class="navi-info-tags">
+                            <span class="navi-tag">平均 ¥${h.avgFare.toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <button class="navi-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}&travelmode=driving')">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                    </button>
+                </div>
+            `;
         });
-    });
-    document.querySelectorAll('#long-content .filter-btn[data-fare]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('#long-content .filter-btn[data-fare]').forEach(b => b.classList.remove('active'));
-            this.classList.add('active'); longFilters.fare = this.dataset.fare; renderLongMap();
+
+        // Long spots
+        NAVI_LONG_SPOTS.forEach(s => {
+            html += `
+                <div class="navi-list-item long">
+                    <div class="navi-icon-block long">💰</div>
+                    <div class="navi-info">
+                        <div class="navi-info-venue">${s.name}</div>
+                        <div class="navi-info-detail">${s.desc}</div>
+                        <div class="navi-info-tags">
+                            <span class="navi-tag">平均 ¥${s.avgFare.toLocaleString()}</span>
+                            <span class="navi-tag">頻度: ${s.freq}</span>
+                        </div>
+                    </div>
+                    <button class="navi-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=driving')">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                    </button>
+                </div>
+            `;
         });
-    });
+
+        container.innerHTML = html;
+    }
+
+    // Update recommend card
+    function updateNaviRecommend() {
+        const venueEl = document.getElementById('navi-recommend-venue');
+        const detailEl = document.getElementById('navi-recommend-detail');
+        const textEl = document.getElementById('navi-recommend-text');
+
+        const activeEvents = naviEvents
+            .map(e => ({ ...e, mins: getEventMinutesRemaining(e.endTime) }))
+            .filter(e => e.mins >= 0)
+            .sort((a, b) => a.mins - b.mins);
+
+        if (activeEvents.length === 0) {
+            venueEl.textContent = 'イベントなし';
+            detailEl.textContent = '';
+            textEl.textContent = 'ホテル・ロングスポットを確認しましょう';
+            return;
+        }
+
+        const nearest = activeEvents[0];
+        venueEl.textContent = nearest.venue;
+        detailEl.textContent = `${nearest.mins}分後終了${nearest.people ? ` / 約${nearest.people.toLocaleString()}人` : ''}`;
+
+        // Check for nearby hotels
+        let nearbyHotel = null;
+        if (nearest.lat && nearest.lng) {
+            NAVI_HOTELS.forEach(h => {
+                const dist = Math.sqrt(Math.pow(h.lat - nearest.lat, 2) + Math.pow(h.lng - nearest.lng, 2));
+                if (dist < 0.02 && (!nearbyHotel || dist < nearbyHotel.dist)) {
+                    nearbyHotel = { ...h, dist };
+                }
+            });
+        }
+
+        if (nearbyHotel) {
+            textEl.textContent = `近くの${nearbyHotel.name}でもロング狙い◎`;
+        } else {
+            textEl.textContent = '';
+        }
+    }
+
+    // Go to current location (navi tab)
+    function goToNaviCurrentLocation() {
+        if (!navigator.geolocation) {
+            alert('位置情報がサポートされていません');
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                if (longMap) {
+                    longMap.setView([lat, lng], 14);
+
+                    if (naviCurrentLocation) {
+                        longMap.removeLayer(naviCurrentLocation);
+                    }
+
+                    const icon = L.divIcon({
+                        className: '',
+                        html: '<div class="current-location-marker"></div>',
+                        iconSize: [22, 22],
+                        iconAnchor: [11, 11]
+                    });
+                    naviCurrentLocation = L.marker([lat, lng], { icon }).addTo(longMap);
+                }
+            },
+            (error) => {
+                console.warn('Geolocation error:', error);
+                alert('位置情報を取得できませんでした');
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
 
     // ========================================
     // DASHBOARD TAB
