@@ -550,7 +550,7 @@
     <!-- Tab Bar -->
     <div class="tab-bar">
         <div class="tab active" data-tab="events"><span class="tab-icon">📅</span>イベント</div>
-        <div class="tab" data-tab="apps"><span class="tab-icon">🔥</span>ホットスポット</div>
+        <div class="tab" data-tab="apps"><span class="tab-icon">🔥</span>スポット</div>
         <div class="tab" data-tab="long"><span class="tab-icon">🗺</span>ロング</div>
         <div class="tab" data-tab="dashboard"><span class="tab-icon">📊</span>収益</div>
     </div>
@@ -1059,6 +1059,12 @@
             const tabName = this.dataset.tab;
             document.getElementById(tabName + '-content').classList.add('active');
 
+            // FABボタンはイベントタブでのみ表示
+            const fabBtn = document.getElementById('fabBtn');
+            if (fabBtn) {
+                fabBtn.style.display = tabName === 'events' ? 'flex' : 'none';
+            }
+
             if (tabName === 'apps') {
                 setTimeout(() => { initAppMap(); if (appMap) appMap.invalidateSize(); }, 200);
             } else if (tabName === 'long') {
@@ -1208,7 +1214,7 @@
     // Initialize hotspot map
     function initAppMap() {
         if (appMap) return;
-        appMap = L.map('map', { center: [34.6937, 135.5023], zoom: 12, zoomControl: false });
+        appMap = L.map('map', { center: [34.6937, 135.5023], zoom: 13, zoomControl: false });
         L.control.zoom({ position: 'bottomright' }).addTo(appMap);
         L.tileLayer('https://tile.openstreetmap.jp/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap © CartoDB', maxZoom: 19
