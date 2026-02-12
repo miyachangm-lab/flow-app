@@ -1766,13 +1766,6 @@
 
     // Auto-refresh every 60s
     setInterval(() => updateNextBanner(EVENTS), 60000);
-
-    // Register Service Worker for PWA
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').then(() => {
-            console.log('✅ Service Worker registered');
-        }).catch(e => console.warn('SW registration failed:', e));
-    }
     </script>
 </body>
 </html>
