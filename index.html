@@ -547,19 +547,20 @@
         .navi-filter-btn {
             display: flex; align-items: center; gap: 5px;
             padding: 4px 10px; border-radius: 14px;
-            font-size: 10px; font-weight: 700;
-            cursor: pointer; transition: all 0.2s; border: 1px solid;
+            font-size: 10px; font-weight: 800;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
         .navi-filter-btn.event {
-            background: rgba(255,152,0,0.2); border-color: rgba(255,152,0,0.4); color: #ffb74d;
+            background: rgba(255,152,0,0.35); border: 1.5px solid rgba(255,152,0,0.7); color: #fff;
         }
         .navi-filter-btn.hotel {
-            background: rgba(156,39,176,0.2); border-color: rgba(156,39,176,0.35); color: #ce93d8;
+            background: rgba(156,39,176,0.35); border: 1.5px solid rgba(156,39,176,0.7); color: #fff;
         }
         .navi-filter-btn.long {
-            background: rgba(33,150,243,0.2); border-color: rgba(33,150,243,0.35); color: #64b5f6;
+            background: rgba(33,150,243,0.35); border: 1.5px solid rgba(33,150,243,0.7); color: #fff;
         }
-        .navi-filter-btn.off { opacity: 0.35; }
+        .navi-filter-btn.off { opacity: 0.3; }
         .navi-filter-dot {
             width: 5px; height: 5px; border-radius: 50%; background: #ff9800;
             animation: naviDotPulse 1.5s ease-in-out infinite;
@@ -588,6 +589,7 @@
         }
         .navi-sheet-handle {
             display: flex; justify-content: center; padding: 8px 0;
+            touch-action: none; cursor: pointer;
         }
         .navi-sheet-handle-bar {
             width: 36px; height: 4px; border-radius: 2px;
@@ -1699,6 +1701,7 @@
     let naviEvents = [];
     let naviOpenList = null; // 'event' or 'hotel' or null
     let naviUpdateInterval = null;
+    let naviSheetStartY = 0, naviSheetDragging = false;
 
     // Hotel data for navi tab
     const NAVI_HOTELS = [
@@ -1726,6 +1729,7 @@
             attribution: '© OpenStreetMap © CartoDB', maxZoom: 19
         }).addTo(longMap);
         fetchNaviEvents();
+        initNaviSheetSwipe();
         updateNaviLocationBtnPosition();
         // Update every minute
         if (naviUpdateInterval) clearInterval(naviUpdateInterval);
@@ -1736,6 +1740,70 @@
                 updateNaviRecommend();
             }
         }, 60000);
+    }
+
+    // Initialize sheet swipe handling
+    function initNaviSheetSwipe() {
+        const handle = document.querySelector('.navi-sheet-handle');
+        if (!handle) return;
+
+        handle.addEventListener('touchstart', onNaviSheetTouchStart, { passive: false });
+        handle.addEventListener('touchmove', onNaviSheetTouchMove, { passive: false });
+        handle.addEventListener('touchend', onNaviSheetTouchEnd, { passive: false });
+        handle.addEventListener('click', onNaviSheetHandleClick);
+    }
+
+    function onNaviSheetTouchStart(e) {
+        naviSheetDragging = true;
+        naviSheetStartY = e.touches[0].clientY;
+    }
+
+    function onNaviSheetTouchMove(e) {
+        if (!naviSheetDragging) return;
+        e.preventDefault();
+    }
+
+    function onNaviSheetTouchEnd(e) {
+        if (!naviSheetDragging) return;
+        naviSheetDragging = false;
+
+        const endY = e.changedTouches[0].clientY;
+        const deltaY = endY - naviSheetStartY;
+
+        if (deltaY > 50) {
+            // Swiped down - close list and minimize sheet
+            closeNaviList();
+        } else if (deltaY < -50) {
+            // Swiped up - expand list (event tab if none active)
+            if (!naviOpenList) {
+                toggleNaviList('event');
+            }
+        }
+    }
+
+    function onNaviSheetHandleClick() {
+        // Toggle: if open, close; if closed, open event tab
+        if (naviOpenList) {
+            closeNaviList();
+        } else {
+            toggleNaviList('event');
+        }
+    }
+
+    // Close all lists
+    function closeNaviList() {
+        naviOpenList = null;
+        const eventWrap = document.getElementById('navi-list-wrap-event');
+        const hotelWrap = document.getElementById('navi-list-wrap-hotel');
+        const eventTab = document.getElementById('navi-tab-event');
+        const hotelTab = document.getElementById('navi-tab-hotel');
+
+        eventWrap?.classList.remove('open');
+        hotelWrap?.classList.remove('open');
+        eventTab?.classList.remove('active');
+        hotelTab?.classList.remove('active');
+
+        setTimeout(updateNaviLocationBtnPosition, 350);
     }
 
     // Update location button position based on sheet state
