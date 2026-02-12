@@ -1215,7 +1215,7 @@
     function initAppMap() {
         if (appMap) return;
         appMap = L.map('map', { center: [34.6937, 135.5023], zoom: 13, zoomControl: false });
-        L.control.zoom({ position: 'bottomright' }).addTo(appMap);
+        L.control.zoom({ position: 'topright' }).addTo(appMap);
         L.tileLayer('https://tile.openstreetmap.jp/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap © CartoDB', maxZoom: 19
         }).addTo(appMap);
