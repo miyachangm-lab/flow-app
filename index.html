@@ -1650,13 +1650,25 @@
         if (sb) {
             try {
                 // Check for duplicate (same date, venue, end_time)
-                const { data: existing } = await sb
+                const { data: existing, error: selectError } = await sb
                     .from('flow_manual_events')
                     .select('id')
                     .eq('event_date', today)
                     .eq('venue', newEvent.venue)
                     .eq('end_time', newEvent.endTime)
                     .limit(1);
+
+                if (selectError) {
+                    console.warn('Duplicate check failed:', selectError);
+                    btn.textContent = '❌ 重複チェックに失敗しました';
+                    btn.style.background = '#ef4444';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.background = '';
+                        btn.disabled = false;
+                    }, 2000);
+                    return;
+                }
 
                 if (existing && existing.length > 0) {
                     console.log('⚠️ Duplicate event found');
