@@ -1,127 +1,57 @@
-# CLAUDE.md - FLOW App
+# FLOW - タクシー需要予測アプリ
 
 ## プロジェクト概要
-
-**FLOW (Demand Flow Navigator)** は大阪・関西エリアのライドシェアドライバー向け需要予測PWAアプリ。イベント情報とピックアップパターンを可視化し、効率的な乗車戦略をサポートする。
+大阪のタクシードライバー向けの需要予測PWAアプリ。イベント情報、過去の乗車実績、ホテル・ロングスポットを地図上に表示し、最適な待機場所をナビゲーションする。
 
 ## 技術スタック
+- フロントエンド: バニラHTML/CSS/JavaScript（フレームワークなし）
+- 地図: Mapbox GL JS
+- データベース: Supabase（PostgreSQL）
+- ホスティング: Netlify
+- PWA対応（ホーム画面インストール可能）
 
-### フロントエンド
-- **HTML5 / CSS3 / Vanilla JavaScript (ES6+)** - フレームワークなし、単一HTMLファイル構成
-- **Leaflet 1.9.4** - 地図表示
-- **Leaflet.Heat 0.2.0** - ヒートマップ可視化
-- **Chart.js 4.4.1** - 収益グラフ描画
-- **Google Fonts** - Noto Sans JP, Inter
+## Supabaseテーブル構造
+- `flow_events`: イベント情報（会場、日時、収容人数、座標）
+- `flow_manual_events`: 手動登録イベント
+- `flow_venues`: 会場マスタ（名前、座標、収容人数）
+- `flow_taxi_logs`: 乗車ログ（日付、時間、エリア、運賃、アプリ種別、降車エリア、メモ）
 
-### バックエンド
-- **Supabase** - BaaS（データベース・認証）
-  - テーブル: `flow_events`, `flow_facilities`, `flow_manual_events`
+## アプリ構成（4タブ）
+1. **イベント**（📅）: 今日のイベント一覧、会場のGoogle Mapsナビ起動
+2. **スポット**（🔥）: 時間帯×曜日の過去実績ヒートマップ、ホットスポット表示
+3. **ナビ**（🧭）: イベント終了カウントダウン + ホテル + ロングスポットの統合地図、ボトムシート式リスト
+4. **収益**（📊）: 売上ダッシュボード、アプリ別売上、月別推移
 
-### 外部API
-- **OpenStreetMap (JP)** - 地図タイル
-- **Google Maps** - ナビゲーションリンク
+## デザインルール
+- **ダークテーマ**: 背景 #0a0a0f、カード背景 rgba(10,10,20,0.88)
+- **メインカラー**: #00e676（緑）- ナビボタン、アクセント
+- **イベント系**: #ff9800（オレンジ）、緊急 #ff1744（赤）
+- **ホテル系**: #9c27b0（紫）
+- **ロング系**: #2196f3（青）
+- **カード**: backdrop-filter: blur(12px)、border-radius: 12-14px
+- **フォント**: Noto Sans JP
+- **ナビボタン**: 緑の丸ボタン、タップでGoogle Mapsナビ起動
 
-## ファイル構成
+## 地図設定
+- 初期表示: 大阪市中心部（34.6937, 135.5023）、ズーム13
+- スタイル: Mapbox Dark
+- ズームコントロール: 右上
+- 現在地ボタン: 右下（ボトムシートと被らない位置）
 
-```
-flow-app/
-├── index.html          # メインアプリ（HTML/CSS/JS全て含む、約1,100行）
-├── manifest.json       # PWA設定
-├── apple-touch-icon.png
-├── icon-192.png
-├── icon-512.png
-└── CLAUDE.md
-```
+## デプロイ
+- Netlifyに自動デプロイ（GitHub連携）
+- サイト: jovial-sunflower-fc26bd.netlify.app
+- ブランチ: main
 
-## アーキテクチャ
-
-### 4タブ構成
-1. **Events** - イベントタイムライン、カウントダウン
-2. **Apps** - ピックアップ位置マップ（Uber/DiDi）
-3. **Long** - 長距離案件マップ（運賃フィルター）
-4. **Dashboard** - 収益ダッシュボード（日次/週次/月次）
-
-### データモデル
-
-```javascript
-// イベント
-{
-  venue: String,      // 会場名
-  artist: String,     // アーティスト名
-  startTime: String,  // "HH:MM"
-  endTime: String,    // "HH:MM"
-  type: 'concert' | 'hotel' | 'facility',
-  rank: 'S' | 'A' | 'B',
-  people: Number,     // 予想人数
-  source: 'auto' | 'manual' | 'facility'
-}
-
-// ピックアップ/長距離
-{
-  lat: Number, lng: Number,
-  app: 'uber' | 'didi' | 'nagashi',
-  period: 'morning' | 'day' | 'evening' | 'night',
-  fare: Number  // 長距離のみ
-}
-```
-
-### グローバル状態
-```javascript
-EVENTS = []           // イベント配列
-currentFilter = 'all' // イベントフィルター
-appFilters = { view, period, app }
-longFilters = { view, period, fare }
-```
-
-## 開発ルール
-
-### コーディング規約
-- **単一ファイル構成を維持** - ビルドシステムなし、index.htmlに全コード
-- **日本語UI** - ユーザー向けテキストは全て日本語
-- **モバイルファースト** - ポートレート表示最適化
-
-### カラーシステム
-| 要素 | 色 |
-|------|-----|
-| ランクS | Hot Pink (#ec4899) |
-| ランクA | Amber (#f59e0b) |
-| ランクB | Gray (#6b7280) |
-| Uber | Green |
-| DiDi | Orange |
-| 高額運賃(¥5,000+) | Red |
-
-### ダッシュボード機能
-- **サマリーカード**: 売上、乗車回数、平均単価、ロング率
-- **売上推移グラフ**: Chart.js による折れ線グラフ
-- **時間帯別売上**: 朝/昼/夕/夜 の棒グラフ
-- **アプリ別内訳**: Uber/DiDi/流し の売上・比率
-- **エリア別ランキング**: 売上上位5エリア
-
-### 重要な関数
-| 関数 | 役割 |
-|------|------|
-| `initializeApp()` | アプリ初期化 |
-| `fetchTodayEvents()` | Supabaseからイベント取得 |
-| `renderTimeline()` | タイムライン描画 |
-| `updateNextBanner()` | 次イベントカウントダウン更新 |
-| `initAppMap()` / `renderAppMap()` | ピックアップマップ管理 |
-| `openNavi(venue)` | Google Mapsナビ起動 |
-
-### 会場座標
-`VENUE_COORDS` オブジェクトに30以上の大阪主要会場のGPS座標を定義済み。
+## コーディング規約
+- 日本語コメント推奨
+- CSSはインラインまたはHTML内の<style>タグ（外部CSSファイルなし）
+- JavaScriptもHTML内の<script>タグまたは同一ディレクトリのjsファイル
+- Supabaseの接続情報はコード内に直接記載（個人プロジェクトのため）
+- commit後は必ずpushすること
 
 ## 注意事項
-
-- **Supabase匿名キー** - フロントエンドに公開（読み取り専用アクセス用）
-- **sw.js未実装** - Service Worker登録コードはあるがファイル未作成
-- **自動更新** - バナーは60秒ごとに更新 (`setInterval`)
-
-## コマンド
-
-ビルドシステムなし。ローカルサーバーで直接配信可能:
-```bash
-# 開発サーバー起動例
-python -m http.server 8000
-# または
-npx serve .
-```
+- +ボタン（LINE追加）はイベントタブのみ表示
+- PWAのmanifest.jsonとservice-worker.jsを壊さないこと
+- iPhoneのsafe-area-inset-bottomを考慮すること
+- 運転中にチラ見する想定なので、重要情報は大きく太く表示
