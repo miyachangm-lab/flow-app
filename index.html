@@ -534,6 +534,27 @@
             0%, 100% { box-shadow: 0 0 0 2px rgba(66,133,244,0.3), 0 2px 8px rgba(0,0,0,0.3); }
             50% { box-shadow: 0 0 0 8px rgba(66,133,244,0.15), 0 2px 8px rgba(0,0,0,0.3); }
         }
+        /* Optimal position pulse marker */
+        .optimal-pulse-marker {
+            width: 28px; height: 28px; border-radius: 50%;
+            animation: optimalPulse 1.5s ease-in-out infinite;
+        }
+        .optimal-pulse-marker.event {
+            background: rgba(255,152,0,0.9);
+            box-shadow: 0 0 0 4px rgba(255,152,0,0.3), 0 0 20px rgba(255,152,0,0.5);
+        }
+        .optimal-pulse-marker.hotel {
+            background: rgba(206,147,216,0.9);
+            box-shadow: 0 0 0 4px rgba(206,147,216,0.3), 0 0 20px rgba(206,147,216,0.5);
+        }
+        .optimal-pulse-marker.long {
+            background: rgba(100,181,246,0.9);
+            box-shadow: 0 0 0 4px rgba(100,181,246,0.3), 0 0 20px rgba(100,181,246,0.5);
+        }
+        @keyframes optimalPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.8; }
+        }
 
         /* Navi Tab Styles */
         .navi-map-wrap {
@@ -595,30 +616,161 @@
             width: 36px; height: 4px; border-radius: 2px;
             background: rgba(255,255,255,0.2);
         }
-        .navi-sheet-recommend {
+        /* Optimal Position Card */
+        .navi-optimal-wrap {
+            padding: 0 12px 10px;
+        }
+        .navi-optimal-card {
+            padding: 14px; border-radius: 14px;
+            border: 1.5px solid rgba(0,230,118,0.25);
+            background: rgba(0,230,118,0.03);
+            position: relative;
+            transition: opacity 0.3s ease;
+        }
+        .navi-optimal-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .navi-optimal-label {
+            font-size: 11px; color: #00e676; font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .navi-optimal-badge {
+            font-size: 10px; font-weight: 700; padding: 3px 8px;
+            border-radius: 10px; border: 1px solid;
+        }
+        .navi-optimal-badge.hot {
+            background: rgba(255,23,68,0.2); border-color: rgba(255,23,68,0.4); color: #ff5252;
+        }
+        .navi-optimal-badge.high {
+            background: rgba(255,152,0,0.2); border-color: rgba(255,152,0,0.4); color: #ff9800;
+        }
+        .navi-optimal-badge.mid {
+            background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #999;
+        }
+        .navi-optimal-body {
             display: flex; align-items: center; gap: 12px;
-            padding: 10px 14px; margin: 0 12px 10px;
-            background: rgba(255,152,0,0.06);
-            border: 1px solid rgba(255,152,0,0.25); border-radius: 12px;
         }
-        .navi-sheet-recommend-icon { font-size: 24px; flex-shrink: 0; }
-        .navi-sheet-recommend-info { flex: 1; min-width: 0; }
-        .navi-sheet-recommend-main {
-            font-size: 15px; font-weight: 900; color: white;
+        .navi-optimal-info { flex: 1; min-width: 0; }
+        .navi-optimal-venue {
+            font-size: 20px; font-weight: 900; color: white;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            margin-bottom: 4px;
+        }
+        .navi-optimal-venue.event { color: #ff9800; }
+        .navi-optimal-venue.hotel { color: #ce93d8; }
+        .navi-optimal-venue.long { color: #64b5f6; }
+        .navi-optimal-reason {
+            font-size: 12px; color: #999; margin-bottom: 8px;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .navi-sheet-recommend-main .venue { color: #ff9800; }
-        .navi-sheet-recommend-sub {
-            font-size: 11px; color: #999; margin-top: 2px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        .navi-optimal-score-row {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
         }
-        .navi-sheet-recommend-btn {
-            width: 44px; height: 44px; border-radius: 50%;
+        .navi-optimal-score-bar {
+            flex: 1; height: 8px; border-radius: 4px;
+            background: rgba(255,255,255,0.06); position: relative;
+            overflow: visible;
+        }
+        .navi-optimal-score-fill {
+            height: 100%; border-radius: 4px;
+            position: relative;
+        }
+        .navi-optimal-score-fill.green { background: #00e676; }
+        .navi-optimal-score-fill.orange { background: #ff9800; }
+        .navi-optimal-score-fill.yellow { background: #fdd835; }
+        .navi-optimal-score-fill.gray { background: #666; }
+        .navi-optimal-score-dot {
+            position: absolute; right: -7px; top: -3px;
+            width: 14px; height: 14px; border-radius: 50%;
+            background: white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .navi-optimal-score-num {
+            font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 900;
+            color: white; min-width: 36px; text-align: right;
+        }
+        .navi-optimal-meta {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 12px;
+        }
+        .navi-optimal-eta { color: #64b5f6; }
+        .navi-optimal-countdown { color: #ff5252; }
+        .navi-optimal-btn {
+            width: 52px; height: 52px; border-radius: 50%;
             background: #00e676; border: none; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .navi-optimal-btn:active { transform: scale(0.95); }
+        .navi-optimal-btn svg { width: 24px; height: 24px; fill: white; }
+        .navi-optimal-empty {
+            text-align: center; padding: 20px; color: #666; font-size: 13px;
+        }
+
+        /* Sub cards (TOP 2, 3) */
+        .navi-sub-label {
+            font-size: 11px; color: #555; margin: 8px 12px 6px;
+        }
+        .navi-sub-cards {
+            display: flex; gap: 8px; padding: 0 12px 10px;
+        }
+        .navi-sub-card {
+            flex: 1; padding: 10px; border-radius: 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            position: relative; cursor: pointer;
+        }
+        .navi-sub-card:active { background: rgba(255,255,255,0.05); }
+        .navi-sub-rank {
+            position: absolute; top: 8px; right: 8px;
+            font-size: 10px; color: #555; font-weight: 700;
+        }
+        .navi-sub-venue {
+            font-size: 13px; font-weight: 800; color: white;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            margin-bottom: 2px; padding-right: 20px;
+        }
+        .navi-sub-venue.event { color: #ff9800; }
+        .navi-sub-venue.hotel { color: #ce93d8; }
+        .navi-sub-venue.long { color: #64b5f6; }
+        .navi-sub-info {
+            font-size: 10px; color: #777; margin-bottom: 6px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .navi-sub-bottom {
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .navi-sub-score-wrap {
+            display: flex; align-items: center; gap: 6px;
+        }
+        .navi-sub-score-bar {
+            width: 50px; height: 4px; border-radius: 2px;
+            background: rgba(255,255,255,0.06);
+        }
+        .navi-sub-score-fill {
+            height: 100%; border-radius: 2px;
+        }
+        .navi-sub-score-num {
+            font-size: 12px; font-weight: 700; color: #888;
+        }
+        .navi-sub-btn {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: #00e676; border: none;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer;
         }
-        .navi-sheet-recommend-btn svg { width: 20px; height: 20px; fill: white; }
+        .navi-sub-btn svg { width: 14px; height: 14px; fill: white; }
+
+        /* Pulse animation for TOP1 marker */
+        @keyframes naviOptimalPulse {
+            0% { box-shadow: 0 0 0 0 rgba(0,230,118,0.6); }
+            100% { box-shadow: 0 0 0 20px rgba(0,230,118,0); }
+        }
+        .navi-marker.optimal {
+            animation: naviOptimalPulse 1.5s ease-out infinite;
+            background: #00e676;
+        }
+        .navi-marker.optimal::after { border-top-color: #00e676; }
         .navi-sheet-tabs {
             display: flex; gap: 8px; padding: 0 12px 10px;
         }
@@ -1172,16 +1324,40 @@
             <div class="navi-sheet-handle">
                 <div class="navi-sheet-handle-bar"></div>
             </div>
-            <!-- Recommend card -->
-            <div class="navi-sheet-recommend" id="navi-recommend">
-                <div class="navi-sheet-recommend-icon">🎯</div>
-                <div class="navi-sheet-recommend-info">
-                    <div class="navi-sheet-recommend-main" id="navi-recommend-main">--</div>
-                    <div class="navi-sheet-recommend-sub" id="navi-recommend-sub">--</div>
+            <!-- Optimal Position Card -->
+            <div class="navi-optimal-wrap" id="navi-optimal-wrap">
+                <!-- TOP1 Main Card -->
+                <div class="navi-optimal-card" id="navi-optimal-top1">
+                    <div class="navi-optimal-header">
+                        <span class="navi-optimal-label">🎯 最適ポジション</span>
+                        <span class="navi-optimal-badge hot" id="navi-optimal-badge">HOT</span>
+                    </div>
+                    <div class="navi-optimal-body">
+                        <div class="navi-optimal-info">
+                            <div class="navi-optimal-venue event" id="navi-optimal-venue">読み込み中...</div>
+                            <div class="navi-optimal-reason" id="navi-optimal-reason">--</div>
+                            <div class="navi-optimal-score-row">
+                                <div class="navi-optimal-score-bar">
+                                    <div class="navi-optimal-score-fill green" id="navi-optimal-score-fill" style="width: 0%"></div>
+                                    <div class="navi-optimal-score-dot" id="navi-optimal-score-dot" style="left: 0%"></div>
+                                </div>
+                                <span class="navi-optimal-score-num" id="navi-optimal-score">--</span>
+                            </div>
+                            <div class="navi-optimal-meta">
+                                <span class="navi-optimal-eta" id="navi-optimal-eta">--</span>
+                                <span class="navi-optimal-countdown" id="navi-optimal-countdown">--</span>
+                            </div>
+                        </div>
+                        <button class="navi-optimal-btn" id="navi-optimal-btn">
+                            <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                        </button>
+                    </div>
                 </div>
-                <button class="navi-sheet-recommend-btn" id="navi-recommend-btn" style="display: none;">
-                    <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
-                </button>
+                <!-- Empty state -->
+                <div class="navi-optimal-empty" id="navi-optimal-empty" style="display: none;">
+                    <div>📍 現在スポットなし</div>
+                    <div style="font-size: 12px; color: #666; margin-top: 4px;">イベント・ホテル情報がありません</div>
+                </div>
             </div>
             <!-- Tabs -->
             <div class="navi-sheet-tabs">
@@ -1202,16 +1378,38 @@
         </div>
         <!-- Sidebar (tablet only) -->
         <div class="navi-sidebar" id="navi-sidebar">
-            <!-- Recommend card -->
-            <div class="navi-sidebar-recommend" id="navi-sidebar-recommend">
-                <div class="navi-sidebar-recommend-header">
-                    <div class="navi-sidebar-recommend-label">🎯 おすすめ待機</div>
-                    <button class="navi-sidebar-recommend-btn" id="navi-sidebar-recommend-btn" style="display: none;">
-                        <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
-                    </button>
+            <!-- Optimal Position Card (Sidebar) -->
+            <div class="navi-optimal-wrap" id="navi-sidebar-optimal-wrap">
+                <div class="navi-optimal-card" id="navi-sidebar-optimal-top1">
+                    <div class="navi-optimal-header">
+                        <span class="navi-optimal-label">🎯 最適ポジション</span>
+                        <span class="navi-optimal-badge hot" id="navi-sidebar-optimal-badge">HOT</span>
+                    </div>
+                    <div class="navi-optimal-body">
+                        <div class="navi-optimal-info">
+                            <div class="navi-optimal-venue event" id="navi-sidebar-optimal-venue">読み込み中...</div>
+                            <div class="navi-optimal-reason" id="navi-sidebar-optimal-reason">--</div>
+                            <div class="navi-optimal-score-row">
+                                <div class="navi-optimal-score-bar">
+                                    <div class="navi-optimal-score-fill green" id="navi-sidebar-optimal-score-fill" style="width: 0%"></div>
+                                    <div class="navi-optimal-score-dot" id="navi-sidebar-optimal-score-dot" style="left: 0%"></div>
+                                </div>
+                                <span class="navi-optimal-score-num" id="navi-sidebar-optimal-score">--</span>
+                            </div>
+                            <div class="navi-optimal-meta">
+                                <span class="navi-optimal-eta" id="navi-sidebar-optimal-eta">--</span>
+                                <span class="navi-optimal-countdown" id="navi-sidebar-optimal-countdown">--</span>
+                            </div>
+                        </div>
+                        <button class="navi-optimal-btn" id="navi-sidebar-optimal-btn">
+                            <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                        </button>
+                    </div>
                 </div>
-                <div class="navi-sidebar-recommend-main" id="navi-sidebar-recommend-main">--</div>
-                <div class="navi-sidebar-recommend-sub" id="navi-sidebar-recommend-sub">--</div>
+                <div class="navi-optimal-empty" id="navi-sidebar-optimal-empty" style="display: none;">
+                    <div>📍 現在スポットなし</div>
+                    <div style="font-size: 12px; color: #666; margin-top: 4px;">イベント・ホテル情報がありません</div>
+                </div>
             </div>
             <!-- Tabs -->
             <div class="navi-sidebar-tabs">
@@ -2054,6 +2252,112 @@
     let naviSidebarTab = 'event'; // Sidebar active tab
     const naviTabletQuery = window.matchMedia('(min-width: 768px)');
 
+    // Optimal position state
+    let naviWatchId = null;
+    let naviUserLat = null, naviUserLng = null;
+    let naviOptimalMarker = null;
+    let naviOptimalLine = null;
+
+    // Calculate distance in km using Haversine formula
+    function getDistanceKm(lat1, lng1, lat2, lng2) {
+        const R = 6371; // Earth radius in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLng = (lng2 - lng1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLng/2) * Math.sin(dLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    // Calculate score for a spot (0-100)
+    function calculateSpotScore(spot, userLat, userLng) {
+        let score = 0;
+        const now = new Date();
+
+        if (spot.type === 'event') {
+            // Event scoring: time remaining + people + distance
+            const mins = getEventMinutesRemaining(spot.endTime);
+            // Time factor: best at 15-30 mins before end (max 40 points)
+            if (mins >= 10 && mins <= 45) {
+                score += 40 - Math.abs(mins - 25);
+            } else if (mins >= 0 && mins < 10) {
+                score += 25 - (10 - mins) * 2;
+            } else if (mins > 45 && mins <= 90) {
+                score += 20;
+            }
+            // People factor (max 30 points)
+            if (spot.people) {
+                score += Math.min(30, spot.people / 500);
+            }
+            // Distance factor (max 30 points, closer is better)
+            if (userLat && userLng && spot.lat && spot.lng) {
+                const dist = getDistanceKm(userLat, userLng, spot.lat, spot.lng);
+                score += Math.max(0, 30 - dist * 3);
+            } else {
+                score += 15; // Default if no location
+            }
+        } else if (spot.type === 'hotel') {
+            // Hotel scoring: checkout time proximity + rooms + distance
+            const checkoutMins = getMinutesToTime(spot.checkout || '11:00');
+            // Best timing: 30 mins before checkout (max 35 points)
+            if (checkoutMins >= 0 && checkoutMins <= 60) {
+                score += 35 - Math.abs(checkoutMins - 20);
+            } else if (checkoutMins > 60 && checkoutMins <= 120) {
+                score += 15;
+            }
+            // Rooms factor (max 35 points)
+            if (spot.rooms) {
+                score += Math.min(35, spot.rooms / 30);
+            }
+            // Distance factor (max 30 points)
+            if (userLat && userLng && spot.lat && spot.lng) {
+                const dist = getDistanceKm(userLat, userLng, spot.lat, spot.lng);
+                score += Math.max(0, 30 - dist * 3);
+            } else {
+                score += 15;
+            }
+        } else if (spot.type === 'long') {
+            // Long spot scoring: time of day + average fare + frequency + distance
+            const hour = now.getHours();
+            // Time factor (max 30 points) - better at night
+            if (hour >= 22 || hour < 4) {
+                score += 30;
+            } else if (hour >= 18 && hour < 22) {
+                score += 20;
+            } else {
+                score += 10;
+            }
+            // Fare factor (max 35 points)
+            if (spot.avgFare) {
+                score += Math.min(35, spot.avgFare / 300);
+            }
+            // Frequency factor (max 15 points)
+            if (spot.freq === '高') score += 15;
+            else if (spot.freq === '中') score += 10;
+            else score += 5;
+            // Distance factor (max 20 points)
+            if (userLat && userLng && spot.lat && spot.lng) {
+                const dist = getDistanceKm(userLat, userLng, spot.lat, spot.lng);
+                score += Math.max(0, 20 - dist * 2);
+            } else {
+                score += 10;
+            }
+        }
+
+        return Math.max(0, Math.min(100, Math.round(score)));
+    }
+
+    // Get minutes until a specific time (HH:MM format)
+    function getMinutesToTime(timeStr) {
+        if (!timeStr) return 999;
+        const [h, m] = timeStr.split(':').map(Number);
+        const now = new Date();
+        const target = new Date(now);
+        target.setHours(h, m, 0, 0);
+        return Math.round((target - now) / 60000);
+    }
+
     // Check if tablet layout
     function isNaviTablet() {
         return naviTabletQuery.matches;
@@ -2138,6 +2442,7 @@
         fetchNaviEvents();
         initNaviSheetSwipe();
         initNaviTablet();
+        initNaviGeolocation();
         updateNaviLocationBtnPosition();
         // Update every minute
         if (naviUpdateInterval) clearInterval(naviUpdateInterval);
@@ -2660,64 +2965,256 @@
         container.innerHTML = html;
     }
 
-    // Update recommend card (both bottom sheet and sidebar)
-    function updateNaviRecommend() {
-        // Bottom sheet elements
-        const mainEl = document.getElementById('navi-recommend-main');
-        const subEl = document.getElementById('navi-recommend-sub');
-        const btnEl = document.getElementById('navi-recommend-btn');
-        // Sidebar elements
-        const sidebarMainEl = document.getElementById('navi-sidebar-recommend-main');
-        const sidebarSubEl = document.getElementById('navi-sidebar-recommend-sub');
-        const sidebarBtnEl = document.getElementById('navi-sidebar-recommend-btn');
+    // Update optimal position card (both bottom sheet and sidebar)
+    function updateOptimalPosition() {
+        // Collect all scorable spots
+        const allSpots = [];
 
-        const activeEvents = naviEvents
-            .map(e => ({ ...e, mins: getEventMinutesRemaining(e.endTime) }))
-            .filter(e => e.mins >= 0)
-            .sort((a, b) => a.mins - b.mins);
+        // Add active events
+        naviEvents.forEach(e => {
+            const mins = getEventMinutesRemaining(e.endTime);
+            if (mins >= -30 && mins <= 120) { // Include events ending soon or in next 2 hours
+                allSpots.push({
+                    type: 'event',
+                    name: e.venue,
+                    lat: e.lat,
+                    lng: e.lng,
+                    endTime: e.endTime,
+                    people: e.people,
+                    mins: mins
+                });
+            }
+        });
 
-        if (activeEvents.length === 0) {
-            if (mainEl) mainEl.innerHTML = 'イベントなし';
-            if (subEl) subEl.textContent = 'ホテル・ロングスポットを確認';
-            if (btnEl) btnEl.style.display = 'none';
-            if (sidebarMainEl) sidebarMainEl.innerHTML = 'イベントなし';
-            if (sidebarSubEl) sidebarSubEl.textContent = 'ホテル・ロングスポットを確認';
-            if (sidebarBtnEl) sidebarBtnEl.style.display = 'none';
-            return;
-        }
-
-        const nearest = activeEvents[0];
-        const mainHtml = `<span class="venue">${nearest.venue}</span> へ向かう`;
-        if (mainEl) mainEl.innerHTML = mainHtml;
-        if (sidebarMainEl) sidebarMainEl.innerHTML = mainHtml;
-
-        // Check for nearby hotels
-        let nearbyHotel = null;
-        if (nearest.lat && nearest.lng) {
+        // Add hotels (during checkout hours)
+        const now = new Date();
+        const hour = now.getHours();
+        if (hour >= 9 && hour <= 13) {
             NAVI_HOTELS.forEach(h => {
-                const dist = Math.sqrt(Math.pow(h.lat - nearest.lat, 2) + Math.pow(h.lng - nearest.lng, 2));
-                if (dist < 0.02 && (!nearbyHotel || dist < nearbyHotel.dist)) {
-                    nearbyHotel = { ...h, dist };
-                }
+                allSpots.push({
+                    type: 'hotel',
+                    name: h.name,
+                    lat: h.lat,
+                    lng: h.lng,
+                    checkout: h.checkout,
+                    rooms: h.rooms,
+                    avgFare: h.avgFare
+                });
             });
         }
 
-        let detail = `${nearest.mins}分後終了`;
-        if (nearest.people) detail += ` / 約${nearest.people.toLocaleString()}人`;
-        if (nearbyHotel) detail += ` / 近くに${nearbyHotel.name}`;
-        if (subEl) subEl.textContent = detail;
-        if (sidebarSubEl) sidebarSubEl.textContent = detail;
+        // Add long spots (evening/night or when few events)
+        if (hour >= 18 || hour < 6 || allSpots.length < 2) {
+            NAVI_LONG_SPOTS.forEach(s => {
+                allSpots.push({
+                    type: 'long',
+                    name: s.name,
+                    lat: s.lat,
+                    lng: s.lng,
+                    desc: s.desc,
+                    avgFare: s.avgFare,
+                    freq: s.freq
+                });
+            });
+        }
 
-        // Show navi buttons
-        const naviUrl = `https://www.google.com/maps/dir/?api=1&destination=${nearest.lat},${nearest.lng}&travelmode=driving`;
-        if (btnEl && nearest.lat && nearest.lng) {
-            btnEl.style.display = 'flex';
+        // Score and sort
+        const scored = allSpots.map(spot => ({
+            ...spot,
+            score: calculateSpotScore(spot, naviUserLat, naviUserLng)
+        })).sort((a, b) => b.score - a.score);
+
+        // Get top spot
+        const top = scored[0];
+
+        // Update both mobile and sidebar cards
+        updateOptimalCard('navi-', top, scored);
+        updateOptimalCard('navi-sidebar-', top, scored);
+
+        // Update map marker for top spot
+        updateOptimalMarker(top);
+    }
+
+    // Update a single optimal card (prefix: '' for mobile, 'navi-sidebar-' for sidebar)
+    function updateOptimalCard(prefix, top, scored) {
+        const wrapEl = document.getElementById(prefix + 'optimal-wrap');
+        const cardEl = document.getElementById(prefix + 'optimal-top1');
+        const emptyEl = document.getElementById(prefix + 'optimal-empty');
+        const venueEl = document.getElementById(prefix + 'optimal-venue');
+        const reasonEl = document.getElementById(prefix + 'optimal-reason');
+        const badgeEl = document.getElementById(prefix + 'optimal-badge');
+        const scoreFillEl = document.getElementById(prefix + 'optimal-score-fill');
+        const scoreDotEl = document.getElementById(prefix + 'optimal-score-dot');
+        const scoreNumEl = document.getElementById(prefix + 'optimal-score');
+        const etaEl = document.getElementById(prefix + 'optimal-eta');
+        const countdownEl = document.getElementById(prefix + 'optimal-countdown');
+        const btnEl = document.getElementById(prefix + 'optimal-btn');
+
+        if (!top) {
+            if (cardEl) cardEl.style.display = 'none';
+            if (emptyEl) emptyEl.style.display = 'flex';
+            return;
+        }
+
+        if (cardEl) cardEl.style.display = 'block';
+        if (emptyEl) emptyEl.style.display = 'none';
+
+        // Venue name with type styling
+        if (venueEl) {
+            venueEl.textContent = top.name;
+            venueEl.className = 'navi-optimal-venue ' + top.type;
+        }
+
+        // Reason text
+        if (reasonEl) {
+            let reason = '';
+            if (top.type === 'event') {
+                reason = `${top.mins}分後終了`;
+                if (top.people) reason += ` / ${top.people.toLocaleString()}人`;
+            } else if (top.type === 'hotel') {
+                const checkoutMins = getMinutesToTime(top.checkout);
+                reason = `C/O ${top.checkout}`;
+                if (checkoutMins > 0) reason += ` (${checkoutMins}分後)`;
+                if (top.rooms) reason += ` / ${top.rooms}室`;
+            } else if (top.type === 'long') {
+                reason = top.desc || '高需要エリア';
+                if (top.avgFare) reason += ` / 平均¥${top.avgFare.toLocaleString()}`;
+            }
+            reasonEl.textContent = reason;
+        }
+
+        // Badge
+        if (badgeEl) {
+            if (top.score >= 70) {
+                badgeEl.textContent = 'HOT';
+                badgeEl.className = 'navi-optimal-badge hot';
+            } else if (top.score >= 50) {
+                badgeEl.textContent = '高';
+                badgeEl.className = 'navi-optimal-badge high';
+            } else {
+                badgeEl.textContent = '中';
+                badgeEl.className = 'navi-optimal-badge mid';
+            }
+        }
+
+        // Score bar
+        if (scoreFillEl) {
+            scoreFillEl.style.width = top.score + '%';
+            if (top.score >= 70) scoreFillEl.className = 'navi-optimal-score-fill green';
+            else if (top.score >= 50) scoreFillEl.className = 'navi-optimal-score-fill orange';
+            else if (top.score >= 30) scoreFillEl.className = 'navi-optimal-score-fill yellow';
+            else scoreFillEl.className = 'navi-optimal-score-fill gray';
+        }
+        if (scoreDotEl) {
+            scoreDotEl.style.left = top.score + '%';
+        }
+        if (scoreNumEl) {
+            scoreNumEl.textContent = top.score;
+        }
+
+        // ETA (distance)
+        if (etaEl) {
+            if (naviUserLat && naviUserLng && top.lat && top.lng) {
+                const dist = getDistanceKm(naviUserLat, naviUserLng, top.lat, top.lng);
+                const eta = Math.round(dist * 3); // Roughly 3 min per km
+                etaEl.textContent = `📍 ${dist.toFixed(1)}km / 約${eta}分`;
+            } else {
+                etaEl.textContent = '📍 --';
+            }
+        }
+
+        // Countdown
+        if (countdownEl) {
+            if (top.type === 'event' && top.mins !== undefined) {
+                countdownEl.textContent = `⏱ ${top.mins}分`;
+            } else if (top.type === 'hotel') {
+                const mins = getMinutesToTime(top.checkout);
+                if (mins > 0 && mins < 180) {
+                    countdownEl.textContent = `⏱ ${mins}分`;
+                } else {
+                    countdownEl.textContent = '';
+                }
+            } else {
+                countdownEl.textContent = '';
+            }
+        }
+
+        // Navi button
+        if (btnEl && top.lat && top.lng) {
+            const naviUrl = `https://www.google.com/maps/dir/?api=1&destination=${top.lat},${top.lng}&travelmode=driving`;
             btnEl.onclick = () => window.open(naviUrl);
         }
-        if (sidebarBtnEl && nearest.lat && nearest.lng) {
-            sidebarBtnEl.style.display = 'flex';
-            sidebarBtnEl.onclick = () => window.open(naviUrl);
+    }
+
+    // Update map marker for optimal spot
+    function updateOptimalMarker(top) {
+        if (!longMap) return;
+
+        // Remove existing marker and line
+        if (naviOptimalMarker) {
+            longMap.removeLayer(naviOptimalMarker);
+            naviOptimalMarker = null;
         }
+        if (naviOptimalLine) {
+            longMap.removeLayer(naviOptimalLine);
+            naviOptimalLine = null;
+        }
+
+        if (!top || !top.lat || !top.lng) return;
+
+        // Add pulse marker for top spot
+        const pulseIcon = L.divIcon({
+            className: '',
+            html: `<div class="optimal-pulse-marker ${top.type}"></div>`,
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
+        });
+        naviOptimalMarker = L.marker([top.lat, top.lng], { icon: pulseIcon }).addTo(longMap);
+
+        // Add dashed line from user to spot
+        if (naviUserLat && naviUserLng) {
+            naviOptimalLine = L.polyline(
+                [[naviUserLat, naviUserLng], [top.lat, top.lng]],
+                { color: '#00e676', weight: 2, dashArray: '8, 8', opacity: 0.7 }
+            ).addTo(longMap);
+        }
+    }
+
+    // Start watching user location for optimal position
+    function initNaviGeolocation() {
+        if (!navigator.geolocation) return;
+
+        // Initial position
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                naviUserLat = pos.coords.latitude;
+                naviUserLng = pos.coords.longitude;
+                updateOptimalPosition();
+            },
+            () => {
+                // Use default location (Osaka center)
+                naviUserLat = 34.6937;
+                naviUserLng = 135.5023;
+                updateOptimalPosition();
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+
+        // Watch position updates
+        naviWatchId = navigator.geolocation.watchPosition(
+            (pos) => {
+                naviUserLat = pos.coords.latitude;
+                naviUserLng = pos.coords.longitude;
+                updateOptimalPosition();
+            },
+            () => {},
+            { enableHighAccuracy: true, timeout: 30000, maximumAge: 60000 }
+        );
+    }
+
+    // Legacy function name for compatibility
+    function updateNaviRecommend() {
+        updateOptimalPosition();
     }
 
     // Go to current location (navi tab)
