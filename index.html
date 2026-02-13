@@ -61,7 +61,6 @@
             position: sticky; top: 0; z-index: 100;
             background: var(--navy);
             padding: 16px 20px;
-            padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -744,39 +743,25 @@
            TABLET LAYOUT (768px+)
            ======================================== */
         @media (min-width: 768px) {
-            /* Body - flex column for proper height calculation */
-            body {
-                display: flex; flex-direction: column;
-                height: 100vh;
-            }
-
-            /* Header - single row layout with fixed padding for status bar */
+            /* Header - horizontal layout for tablet */
             .header {
-                height: auto; min-height: 48px;
-                padding: 0 20px;
-                padding-top: 24px;
-                display: flex; align-items: center; gap: 24px;
-                flex-shrink: 0;
-            }
-
-            /* PWA standalone mode - extra padding for status bar */
-            @media (display-mode: standalone) {
-                .header {
-                    padding-top: 28px;
-                }
+                padding: 12px 20px;
+                display: flex; align-items: center; gap: 20px;
             }
             .header-left { flex-direction: row; align-items: center; gap: 12px; }
             .app-name { font-size: 20px; }
             .app-subtitle { font-size: 9px; }
             .header-date { display: none; }
 
-            /* Tab bar - pill style inside header */
+            /* Tab bar - horizontal pill style */
             .tab-bar {
-                position: absolute; left: 50%; transform: translateX(-50%);
+                display: flex; justify-content: center;
                 background: rgba(255,255,255,0.04); border-radius: 10px; padding: 3px;
                 border: none; gap: 2px;
+                margin: 0 auto;
             }
             .tab {
+                flex: none;
                 padding: 8px 20px; font-size: 14px; font-weight: 600;
                 border-radius: 8px; border-bottom: none;
                 color: #666;
@@ -795,11 +780,11 @@
             .header-tablet-clock { font-size: 20px; font-weight: 900; color: #00e676; font-family: 'Inter', sans-serif; }
 
             /* Content area */
-            .content { padding-bottom: 0; flex: 1; overflow: hidden; }
+            .content { padding-bottom: 0; }
 
-            /* Navi tab - side by side layout, fill remaining height */
+            /* Navi tab - side by side layout */
             #long-content.active {
-                display: flex; height: 100%;
+                display: flex; height: calc(100vh - 120px);
             }
 
             /* Map takes remaining space */
@@ -984,15 +969,19 @@
            iPad mini LAYOUT (768px - 1150px)
            ======================================== */
         @media (min-width: 768px) and (max-width: 1150px) {
-            /* Header - compact with fixed padding for status bar */
+            /* Header - compact */
             .header {
-                min-height: 44px;
-                padding-top: 20px;
+                padding: 10px 16px;
             }
 
             /* Tabs - compact */
             .tab { padding: 6px 14px; font-size: 13px; }
             .tab-icon { font-size: 13px; }
+
+            /* Navi content height for iPad mini */
+            #long-content.active {
+                height: calc(100vh - 100px);
+            }
 
             /* Header time - compact */
             .header-tablet-clock { font-size: 17px; }
