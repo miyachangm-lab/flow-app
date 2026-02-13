@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>FLOW - Demand Flow Navigator</title>
@@ -61,6 +61,7 @@
             position: sticky; top: 0; z-index: 100;
             background: var(--navy);
             padding: 16px 20px;
+            padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -745,7 +746,9 @@
         @media (min-width: 768px) {
             /* Header - single row layout */
             .header {
-                height: 52px; padding: 0 20px;
+                height: calc(env(safe-area-inset-top, 0px) + 52px);
+                padding: 0 20px;
+                padding-top: env(safe-area-inset-top, 0px);
                 display: flex; align-items: center; gap: 24px;
             }
             .header-left { flex-direction: row; align-items: center; gap: 12px; }
@@ -782,7 +785,7 @@
 
             /* Navi tab - side by side layout */
             #long-content.active {
-                display: flex; height: calc(100vh - 52px);
+                display: flex; height: calc(100vh - 52px - env(safe-area-inset-top, 0px));
             }
 
             /* Map takes remaining space */
@@ -968,7 +971,7 @@
            ======================================== */
         @media (min-width: 768px) and (max-width: 1150px) {
             /* Header - compact */
-            .header { height: 48px; }
+            .header { height: calc(env(safe-area-inset-top, 0px) + 48px); }
 
             /* Tabs - compact */
             .tab { padding: 6px 14px; font-size: 13px; }
@@ -978,7 +981,7 @@
             .header-tablet-clock { font-size: 17px; }
 
             /* Content height adjustment */
-            #long-content.active { height: calc(100vh - 48px); }
+            #long-content.active { height: calc(100vh - 48px - env(safe-area-inset-top, 0px)); }
 
             /* Map markers - compact */
             .navi-filter-btn { font-size: 12px; padding: 6px 12px; }
