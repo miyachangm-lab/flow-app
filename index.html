@@ -735,6 +735,233 @@
         }
         .navi-marker.urgent { animation: naviRingPulse 1.5s ease-out infinite; }
         .navi-empty { text-align: center; padding: 24px; color: #666; font-size: 13px; }
+
+        /* Sidebar (tablet only, hidden by default) */
+        .navi-sidebar { display: none; }
+
+        /* ========================================
+           TABLET LAYOUT (768px+)
+           ======================================== */
+        @media (min-width: 768px) {
+            /* Header - single row layout */
+            .header {
+                height: 52px; padding: 0 20px;
+                display: flex; align-items: center; gap: 24px;
+            }
+            .header-left { flex-direction: row; align-items: center; gap: 12px; }
+            .app-name { font-size: 20px; }
+            .app-subtitle { font-size: 9px; }
+            .header-date { display: none; }
+
+            /* Tab bar - pill style inside header */
+            .tab-bar {
+                position: absolute; left: 50%; transform: translateX(-50%);
+                background: rgba(255,255,255,0.04); border-radius: 10px; padding: 3px;
+                border: none; gap: 2px;
+            }
+            .tab {
+                padding: 8px 20px; font-size: 14px; font-weight: 600;
+                border-radius: 8px; border-bottom: none;
+                color: #666;
+            }
+            .tab.active {
+                background: rgba(255,255,255,0.08); color: #fff;
+                border-bottom: none;
+            }
+            .tab-icon { display: inline; font-size: 14px; margin-right: 6px; margin-bottom: 0; }
+
+            /* Header right - date/time */
+            .header-tablet-time {
+                margin-left: auto; display: flex; align-items: center; gap: 12px;
+            }
+            .header-tablet-date { font-size: 14px; color: #888; }
+            .header-tablet-clock { font-size: 20px; font-weight: 900; color: #00e676; font-family: 'Inter', sans-serif; }
+
+            /* Content area */
+            .content { padding-bottom: 0; }
+
+            /* Navi tab - side by side layout */
+            #long-content.active {
+                display: flex; height: calc(100vh - 52px);
+            }
+
+            /* Map takes remaining space */
+            .navi-map-wrap {
+                flex: 1; height: 100%; min-height: auto;
+            }
+
+            /* Filter chips - larger */
+            .navi-filter-btn {
+                font-size: 13px; padding: 7px 14px;
+            }
+
+            /* Markers - larger */
+            .navi-marker {
+                font-size: 13px; padding: 6px 12px;
+            }
+            .navi-marker.later {
+                background: rgba(255,255,255,0.12);
+                border: 1px solid rgba(255,255,255,0.25);
+                color: rgba(255,255,255,0.7);
+            }
+            .navi-marker.later::after {
+                border-top-color: rgba(255,255,255,0.12);
+            }
+
+            /* Location button - fixed position in map area */
+            .navi-location-btn {
+                bottom: 16px !important; right: 16px;
+                width: 48px; height: 48px;
+            }
+
+            /* Hide bottom sheet on tablet */
+            .navi-sheet { display: none; }
+
+            /* Show sidebar on tablet */
+            .navi-sidebar {
+                display: flex; flex-direction: column;
+                width: 420px; flex-shrink: 0;
+                background: linear-gradient(180deg, #0f0f1a 0%, #0a0a12 100%);
+                border-left: 1px solid rgba(255,255,255,0.06);
+            }
+
+            /* Sidebar recommend card */
+            .navi-sidebar-recommend {
+                margin: 16px; padding: 16px;
+                border: 1px solid rgba(255,152,0,0.3); border-radius: 14px;
+                background: rgba(255,152,0,0.04);
+            }
+            .navi-sidebar-recommend-header {
+                display: flex; justify-content: space-between; align-items: flex-start;
+                margin-bottom: 8px;
+            }
+            .navi-sidebar-recommend-label {
+                font-size: 11px; color: #ff9800; font-weight: 700;
+            }
+            .navi-sidebar-recommend-btn {
+                width: 48px; height: 48px; border-radius: 50%;
+                background: #00e676; border: none;
+                display: flex; align-items: center; justify-content: center;
+                cursor: pointer; transition: transform 0.2s;
+            }
+            .navi-sidebar-recommend-btn:hover { transform: scale(1.05); }
+            .navi-sidebar-recommend-btn svg { width: 22px; height: 22px; fill: white; }
+            .navi-sidebar-recommend-main {
+                font-size: 20px; font-weight: 900; color: white;
+                margin-bottom: 4px;
+            }
+            .navi-sidebar-recommend-main .venue { color: #ff9800; }
+            .navi-sidebar-recommend-sub {
+                font-size: 12px; color: #888;
+            }
+
+            /* Sidebar tabs */
+            .navi-sidebar-tabs {
+                display: flex; gap: 8px; padding: 0 16px 12px;
+            }
+            .navi-sidebar-tab {
+                flex: 1; padding: 11px 0; text-align: center;
+                font-size: 14px; font-weight: 700; border-radius: 10px;
+                cursor: pointer; transition: all 0.2s;
+                border: 1px solid;
+            }
+            .navi-sidebar-tab.event {
+                background: rgba(255,152,0,0.06); border-color: rgba(255,152,0,0.15); color: #806040;
+            }
+            .navi-sidebar-tab.event.active {
+                background: rgba(255,152,0,0.12); border-color: rgba(255,152,0,0.5); color: #ff9800;
+                box-shadow: 0 0 12px rgba(255,152,0,0.1);
+            }
+            .navi-sidebar-tab.hotel {
+                background: rgba(156,39,176,0.06); border-color: rgba(156,39,176,0.12); color: #604870;
+            }
+            .navi-sidebar-tab.hotel.active {
+                background: rgba(156,39,176,0.12); border-color: rgba(156,39,176,0.5); color: #ce93d8;
+            }
+
+            /* Sidebar list area */
+            .navi-sidebar-list-wrap {
+                display: none; flex: 1; overflow-y: auto;
+                padding: 8px 16px 16px;
+            }
+            .navi-sidebar-list-wrap.active { display: block; }
+            .navi-sidebar-list-wrap::-webkit-scrollbar { width: 3px; }
+            .navi-sidebar-list-wrap::-webkit-scrollbar-track { background: transparent; }
+            .navi-sidebar-list-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+            /* Section label */
+            .navi-sidebar-section {
+                font-size: 11px; color: #555; font-weight: 700;
+                letter-spacing: 1.5px; text-transform: uppercase;
+                padding: 12px 0 8px; margin-bottom: 4px;
+                border-bottom: 1px solid rgba(255,255,255,0.06);
+            }
+
+            /* Sidebar cards */
+            .navi-sidebar-card {
+                display: flex; align-items: center; gap: 12px; padding: 14px;
+                border-radius: 14px; margin-bottom: 8px;
+                background: rgba(255,255,255,0.02);
+                border-left: 3px solid rgba(255,255,255,0.15);
+                transition: background 0.2s;
+                cursor: pointer;
+            }
+            .navi-sidebar-card:hover { background: rgba(255,255,255,0.05); }
+            .navi-sidebar-card.urgent { border-left-color: #ff1744; }
+            .navi-sidebar-card.soon { border-left-color: #ff9800; }
+            .navi-sidebar-card.hotel { border-left-color: rgba(156,39,176,0.6); }
+            .navi-sidebar-card.long { border-left-color: rgba(33,150,243,0.5); }
+
+            .navi-sidebar-card-countdown {
+                width: 50px; flex-shrink: 0; text-align: center;
+            }
+            .navi-sidebar-card-countdown-num {
+                font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 900; line-height: 1;
+            }
+            .navi-sidebar-card-countdown-num.urgent { color: #ff1744; }
+            .navi-sidebar-card-countdown-num.soon { color: #ff9800; }
+            .navi-sidebar-card-countdown-num.normal { color: #555; }
+            .navi-sidebar-card-countdown-label { font-size: 10px; color: #777; }
+
+            .navi-sidebar-card-icon {
+                width: 44px; height: 44px; border-radius: 12px;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 20px; flex-shrink: 0;
+            }
+            .navi-sidebar-card-icon.hotel { background: rgba(156,39,176,0.12); }
+            .navi-sidebar-card-icon.long { background: rgba(33,150,243,0.1); }
+
+            .navi-sidebar-card-info { flex: 1; min-width: 0; }
+            .navi-sidebar-card-venue {
+                font-size: 15px; font-weight: 700; color: #fff;
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            }
+            .navi-sidebar-card-detail {
+                font-size: 11px; color: #666; margin-top: 2px;
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            }
+            .navi-sidebar-card-tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+            .navi-sidebar-card-tag {
+                font-size: 11px; padding: 3px 8px; border-radius: 6px;
+            }
+            .navi-sidebar-card-tag.people { background: rgba(255,255,255,0.07); color: #999; }
+            .navi-sidebar-card-tag.dist { background: rgba(66,133,244,0.12); color: #64b5f6; }
+            .navi-sidebar-card-tag.fare { background: rgba(0,230,118,0.1); color: #69f0ae; }
+            .navi-sidebar-card-tag.freq { background: rgba(255,255,255,0.06); color: #888; }
+
+            .navi-sidebar-card-btn {
+                width: 44px; height: 44px; border-radius: 50%;
+                background: #00e676; border: none; flex-shrink: 0;
+                display: flex; align-items: center; justify-content: center;
+                cursor: pointer; transition: transform 0.2s;
+            }
+            .navi-sidebar-card-btn:hover { transform: scale(1.05); }
+            .navi-sidebar-card-btn svg { width: 20px; height: 20px; fill: white; }
+
+            .navi-sidebar-empty {
+                text-align: center; padding: 40px 20px; color: #555; font-size: 14px;
+            }
+        }
     </style>
 </head>
 
@@ -746,6 +973,11 @@
             <div class="app-subtitle">demand flow navigator</div>
         </div>
         <div class="header-date" id="headerDate"></div>
+        <!-- Tablet time display -->
+        <div class="header-tablet-time" id="headerTabletTime" style="display: none;">
+            <div class="header-tablet-date" id="headerTabletDate"></div>
+            <div class="header-tablet-clock" id="headerTabletClock"></div>
+        </div>
     </div>
 
     <!-- Tab Bar -->
@@ -877,6 +1109,33 @@
             <div class="navi-list-wrap" id="navi-list-wrap-hotel">
                 <div class="navi-list" id="navi-list-hotel"></div>
             </div>
+        </div>
+        <!-- Sidebar (tablet only) -->
+        <div class="navi-sidebar" id="navi-sidebar">
+            <!-- Recommend card -->
+            <div class="navi-sidebar-recommend" id="navi-sidebar-recommend">
+                <div class="navi-sidebar-recommend-header">
+                    <div class="navi-sidebar-recommend-label">🎯 おすすめ待機</div>
+                    <button class="navi-sidebar-recommend-btn" id="navi-sidebar-recommend-btn" style="display: none;">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                    </button>
+                </div>
+                <div class="navi-sidebar-recommend-main" id="navi-sidebar-recommend-main">--</div>
+                <div class="navi-sidebar-recommend-sub" id="navi-sidebar-recommend-sub">--</div>
+            </div>
+            <!-- Tabs -->
+            <div class="navi-sidebar-tabs">
+                <div class="navi-sidebar-tab event active" id="navi-sidebar-tab-event" onclick="toggleNaviSidebarTab('event')">
+                    🔴 イベント <span id="navi-sidebar-event-count">0</span>
+                </div>
+                <div class="navi-sidebar-tab hotel" id="navi-sidebar-tab-hotel" onclick="toggleNaviSidebarTab('hotel')">
+                    🟣 ホテル・ロング <span id="navi-sidebar-hotel-count">0</span>
+                </div>
+            </div>
+            <!-- Event list -->
+            <div class="navi-sidebar-list-wrap active" id="navi-sidebar-list-event"></div>
+            <!-- Hotel/Long list -->
+            <div class="navi-sidebar-list-wrap" id="navi-sidebar-list-hotel"></div>
         </div>
     </div>
 
@@ -1702,6 +1961,64 @@
     let naviOpenList = null; // 'event' or 'hotel' or null
     let naviUpdateInterval = null;
     let naviSheetStartY = 0, naviSheetDragging = false;
+    let naviSidebarTab = 'event'; // Sidebar active tab
+    const naviTabletQuery = window.matchMedia('(min-width: 768px)');
+
+    // Check if tablet layout
+    function isNaviTablet() {
+        return naviTabletQuery.matches;
+    }
+
+    // Initialize tablet layout handling
+    function initNaviTablet() {
+        // Handle layout changes
+        naviTabletQuery.addEventListener('change', onNaviLayoutChange);
+        updateNaviTabletHeader();
+        // Update header clock every second
+        setInterval(updateNaviTabletHeader, 1000);
+    }
+
+    // Handle layout change (rotation/resize)
+    function onNaviLayoutChange() {
+        if (longMap) {
+            setTimeout(() => longMap.invalidateSize(), 100);
+        }
+        updateNaviLocationBtnPosition();
+        renderNaviList();
+        updateNaviRecommend();
+    }
+
+    // Update tablet header time
+    function updateNaviTabletHeader() {
+        const tabletTime = document.getElementById('headerTabletTime');
+        const tabletDate = document.getElementById('headerTabletDate');
+        const tabletClock = document.getElementById('headerTabletClock');
+        if (!tabletTime) return;
+
+        if (isNaviTablet()) {
+            tabletTime.style.display = 'flex';
+            const now = new Date();
+            const days = ['日', '月', '火', '水', '木', '金', '土'];
+            tabletDate.textContent = `${now.getMonth() + 1}/${now.getDate()}(${days[now.getDay()]})`;
+            tabletClock.textContent = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+        } else {
+            tabletTime.style.display = 'none';
+        }
+    }
+
+    // Toggle sidebar tab (tablet only)
+    function toggleNaviSidebarTab(tab) {
+        naviSidebarTab = tab;
+        const eventTab = document.getElementById('navi-sidebar-tab-event');
+        const hotelTab = document.getElementById('navi-sidebar-tab-hotel');
+        const eventList = document.getElementById('navi-sidebar-list-event');
+        const hotelList = document.getElementById('navi-sidebar-list-hotel');
+
+        eventTab?.classList.toggle('active', tab === 'event');
+        hotelTab?.classList.toggle('active', tab === 'hotel');
+        eventList?.classList.toggle('active', tab === 'event');
+        hotelList?.classList.toggle('active', tab === 'hotel');
+    }
 
     // Hotel data for navi tab
     const NAVI_HOTELS = [
@@ -1730,6 +2047,7 @@
         }).addTo(longMap);
         fetchNaviEvents();
         initNaviSheetSwipe();
+        initNaviTablet();
         updateNaviLocationBtnPosition();
         // Update every minute
         if (naviUpdateInterval) clearInterval(naviUpdateInterval);
@@ -2041,24 +2359,27 @@
         );
     }
 
-    // Render navi list
+    // Render navi list (both bottom sheet and sidebar)
     function renderNaviList() {
         renderNaviEventList();
         renderNaviHotelList();
+        // Also render sidebar if tablet
+        if (isNaviTablet()) {
+            renderNaviSidebarEventList();
+            renderNaviSidebarHotelList();
+        }
     }
 
-    // Render event list
+    // Render event list (bottom sheet)
     function renderNaviEventList() {
         const container = document.getElementById('navi-list-event');
         if (!container) return;
 
-        // Filter and sort events by remaining time
         const activeEvents = naviEvents
             .map(e => ({ ...e, mins: getEventMinutesRemaining(e.endTime) }))
             .filter(e => e.mins >= 0)
             .sort((a, b) => a.mins - b.mins);
 
-        // Update count
         const countEl = document.getElementById('navi-event-count');
         if (countEl) countEl.textContent = activeEvents.length;
 
@@ -2097,19 +2418,17 @@
         container.innerHTML = html;
     }
 
-    // Render hotel/long list
+    // Render hotel/long list (bottom sheet)
     function renderNaviHotelList() {
         const container = document.getElementById('navi-list-hotel');
         if (!container) return;
 
-        // Update count
         const totalCount = NAVI_HOTELS.length + NAVI_LONG_SPOTS.length;
         const countEl = document.getElementById('navi-hotel-count');
         if (countEl) countEl.textContent = totalCount;
 
         let html = '';
 
-        // Hotels
         NAVI_HOTELS.forEach(h => {
             html += `
                 <div class="navi-card hotel">
@@ -2128,7 +2447,6 @@
             `;
         });
 
-        // Long spots
         NAVI_LONG_SPOTS.forEach(s => {
             html += `
                 <div class="navi-card long">
@@ -2151,11 +2469,117 @@
         container.innerHTML = html;
     }
 
-    // Update recommend card
+    // Render sidebar event list (tablet)
+    function renderNaviSidebarEventList() {
+        const container = document.getElementById('navi-sidebar-list-event');
+        if (!container) return;
+
+        const activeEvents = naviEvents
+            .map(e => ({ ...e, mins: getEventMinutesRemaining(e.endTime) }))
+            .filter(e => e.mins >= 0)
+            .sort((a, b) => a.mins - b.mins);
+
+        const countEl = document.getElementById('navi-sidebar-event-count');
+        if (countEl) countEl.textContent = activeEvents.length;
+
+        if (activeEvents.length === 0) {
+            container.innerHTML = '<div class="navi-sidebar-empty">現在開催中のイベントはありません</div>';
+            return;
+        }
+
+        let html = '';
+        activeEvents.forEach(e => {
+            let cardClass = '';
+            let numClass = 'normal';
+            if (e.mins <= 30) { cardClass = 'urgent'; numClass = 'urgent'; }
+            else if (e.mins <= 60) { cardClass = 'soon'; numClass = 'soon'; }
+
+            html += `
+                <div class="navi-sidebar-card ${cardClass}">
+                    <div class="navi-sidebar-card-countdown">
+                        <div class="navi-sidebar-card-countdown-num ${numClass}">${e.mins}</div>
+                        <div class="navi-sidebar-card-countdown-label">分後</div>
+                    </div>
+                    <div class="navi-sidebar-card-info">
+                        <div class="navi-sidebar-card-venue">${e.venue}</div>
+                        <div class="navi-sidebar-card-detail">${e.artist || ''} ${e.endTime}終了</div>
+                        <div class="navi-sidebar-card-tags">
+                            ${e.people ? `<span class="navi-sidebar-card-tag people">👥 ${e.people.toLocaleString()}人</span>` : ''}
+                        </div>
+                    </div>
+                    <button class="navi-sidebar-card-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${e.lat},${e.lng}&travelmode=driving')">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                    </button>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    // Render sidebar hotel/long list (tablet)
+    function renderNaviSidebarHotelList() {
+        const container = document.getElementById('navi-sidebar-list-hotel');
+        if (!container) return;
+
+        const totalCount = NAVI_HOTELS.length + NAVI_LONG_SPOTS.length;
+        const countEl = document.getElementById('navi-sidebar-hotel-count');
+        if (countEl) countEl.textContent = totalCount;
+
+        let html = '<div class="navi-sidebar-section">🏨 ホテル</div>';
+
+        NAVI_HOTELS.forEach(h => {
+            html += `
+                <div class="navi-sidebar-card hotel">
+                    <div class="navi-sidebar-card-icon hotel">🏨</div>
+                    <div class="navi-sidebar-card-info">
+                        <div class="navi-sidebar-card-venue">${h.name}</div>
+                        <div class="navi-sidebar-card-detail">C/O ${h.checkout} / ${h.rooms}室</div>
+                        <div class="navi-sidebar-card-tags">
+                            <span class="navi-sidebar-card-tag fare">平均 ¥${h.avgFare.toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <button class="navi-sidebar-card-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}&travelmode=driving')">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                    </button>
+                </div>
+            `;
+        });
+
+        html += '<div class="navi-sidebar-section">💰 ロングスポット</div>';
+
+        NAVI_LONG_SPOTS.forEach(s => {
+            html += `
+                <div class="navi-sidebar-card long">
+                    <div class="navi-sidebar-card-icon long">💰</div>
+                    <div class="navi-sidebar-card-info">
+                        <div class="navi-sidebar-card-venue">${s.name}</div>
+                        <div class="navi-sidebar-card-detail">${s.desc}</div>
+                        <div class="navi-sidebar-card-tags">
+                            <span class="navi-sidebar-card-tag fare">平均 ¥${s.avgFare.toLocaleString()}</span>
+                            <span class="navi-sidebar-card-tag freq">頻度: ${s.freq}</span>
+                        </div>
+                    </div>
+                    <button class="navi-sidebar-card-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=driving')">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                    </button>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    // Update recommend card (both bottom sheet and sidebar)
     function updateNaviRecommend() {
+        // Bottom sheet elements
         const mainEl = document.getElementById('navi-recommend-main');
         const subEl = document.getElementById('navi-recommend-sub');
         const btnEl = document.getElementById('navi-recommend-btn');
+        // Sidebar elements
+        const sidebarMainEl = document.getElementById('navi-sidebar-recommend-main');
+        const sidebarSubEl = document.getElementById('navi-sidebar-recommend-sub');
+        const sidebarBtnEl = document.getElementById('navi-sidebar-recommend-btn');
 
         const activeEvents = naviEvents
             .map(e => ({ ...e, mins: getEventMinutesRemaining(e.endTime) }))
@@ -2166,11 +2590,16 @@
             if (mainEl) mainEl.innerHTML = 'イベントなし';
             if (subEl) subEl.textContent = 'ホテル・ロングスポットを確認';
             if (btnEl) btnEl.style.display = 'none';
+            if (sidebarMainEl) sidebarMainEl.innerHTML = 'イベントなし';
+            if (sidebarSubEl) sidebarSubEl.textContent = 'ホテル・ロングスポットを確認';
+            if (sidebarBtnEl) sidebarBtnEl.style.display = 'none';
             return;
         }
 
         const nearest = activeEvents[0];
-        if (mainEl) mainEl.innerHTML = `<span class="venue">${nearest.venue}</span> へ向かう`;
+        const mainHtml = `<span class="venue">${nearest.venue}</span> へ向かう`;
+        if (mainEl) mainEl.innerHTML = mainHtml;
+        if (sidebarMainEl) sidebarMainEl.innerHTML = mainHtml;
 
         // Check for nearby hotels
         let nearbyHotel = null;
@@ -2187,13 +2616,17 @@
         if (nearest.people) detail += ` / 約${nearest.people.toLocaleString()}人`;
         if (nearbyHotel) detail += ` / 近くに${nearbyHotel.name}`;
         if (subEl) subEl.textContent = detail;
+        if (sidebarSubEl) sidebarSubEl.textContent = detail;
 
-        // Show navi button
+        // Show navi buttons
+        const naviUrl = `https://www.google.com/maps/dir/?api=1&destination=${nearest.lat},${nearest.lng}&travelmode=driving`;
         if (btnEl && nearest.lat && nearest.lng) {
             btnEl.style.display = 'flex';
-            btnEl.onclick = () => {
-                window.open(`https://www.google.com/maps/dir/?api=1&destination=${nearest.lat},${nearest.lng}&travelmode=driving`);
-            };
+            btnEl.onclick = () => window.open(naviUrl);
+        }
+        if (sidebarBtnEl && nearest.lat && nearest.lng) {
+            sidebarBtnEl.style.display = 'flex';
+            sidebarBtnEl.onclick = () => window.open(naviUrl);
         }
     }
 
