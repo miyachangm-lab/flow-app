@@ -962,6 +962,65 @@
                 text-align: center; padding: 40px 20px; color: #555; font-size: 14px;
             }
         }
+
+        /* ========================================
+           iPad mini LAYOUT (768px - 1150px)
+           ======================================== */
+        @media (min-width: 768px) and (max-width: 1150px) {
+            /* Header - compact */
+            .header { height: 48px; }
+
+            /* Tabs - compact */
+            .tab { padding: 6px 14px; font-size: 13px; }
+            .tab-icon { font-size: 13px; }
+
+            /* Header time - compact */
+            .header-tablet-clock { font-size: 17px; }
+
+            /* Content height adjustment */
+            #long-content.active { height: calc(100vh - 48px); }
+
+            /* Map markers - compact */
+            .navi-filter-btn { font-size: 12px; padding: 6px 12px; }
+            .navi-marker { font-size: 12px; padding: 5px 10px; }
+
+            /* Sidebar - narrower */
+            .navi-sidebar { width: 340px; }
+
+            /* Sidebar recommend - compact */
+            .navi-sidebar-recommend { margin: 12px; padding: 12px; }
+            .navi-sidebar-recommend-main { font-size: 17px; }
+            .navi-sidebar-recommend-btn { width: 44px; height: 44px; }
+            .navi-sidebar-recommend-btn svg { width: 20px; height: 20px; }
+
+            /* Sidebar tabs - compact */
+            .navi-sidebar-tab { padding: 9px 0; font-size: 12px; }
+
+            /* Sidebar list - compact */
+            .navi-sidebar-list-wrap { padding: 6px 12px 12px; }
+
+            /* Section label - compact */
+            .navi-sidebar-section { font-size: 10px; padding: 10px 0 6px; }
+
+            /* Sidebar cards - compact */
+            .navi-sidebar-card { padding: 10px; gap: 10px; }
+            .navi-sidebar-card-countdown { width: 44px; }
+            .navi-sidebar-card-countdown-num { font-size: 22px; }
+            .navi-sidebar-card-icon { width: 38px; height: 38px; font-size: 18px; }
+            .navi-sidebar-card-venue { font-size: 13px; }
+            .navi-sidebar-card-detail { font-size: 10px; }
+            .navi-sidebar-card-tags { gap: 4px; margin-top: 4px; }
+            .navi-sidebar-card-tag { font-size: 10px; padding: 2px 6px; }
+            .navi-sidebar-card-btn { width: 40px; height: 40px; }
+            .navi-sidebar-card-btn svg { width: 18px; height: 18px; }
+        }
+
+        /* ========================================
+           Large iPad LAYOUT (1151px+)
+           ======================================== */
+        @media (min-width: 1151px) {
+            .navi-sidebar { width: 420px; }
+        }
     </style>
 </head>
 
