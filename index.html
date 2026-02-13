@@ -744,12 +744,20 @@
            TABLET LAYOUT (768px+)
            ======================================== */
         @media (min-width: 768px) {
-            /* Header - single row layout */
+            /* Body - flex column for proper height calculation */
+            body {
+                display: flex; flex-direction: column;
+                min-height: 100vh;
+            }
+
+            /* Header - single row layout with fixed padding for status bar */
             .header {
-                height: calc(env(safe-area-inset-top, 0px) + 52px);
+                height: auto; min-height: 52px;
                 padding: 0 20px;
-                padding-top: env(safe-area-inset-top, 0px);
+                padding-top: 24px;
+                padding-top: max(24px, env(safe-area-inset-top, 24px));
                 display: flex; align-items: center; gap: 24px;
+                flex-shrink: 0;
             }
             .header-left { flex-direction: row; align-items: center; gap: 12px; }
             .app-name { font-size: 20px; }
@@ -781,11 +789,11 @@
             .header-tablet-clock { font-size: 20px; font-weight: 900; color: #00e676; font-family: 'Inter', sans-serif; }
 
             /* Content area */
-            .content { padding-bottom: 0; }
+            .content { padding-bottom: 0; flex: 1; overflow: hidden; }
 
-            /* Navi tab - side by side layout */
+            /* Navi tab - side by side layout, fill remaining height */
             #long-content.active {
-                display: flex; height: calc(100vh - 52px - env(safe-area-inset-top, 0px));
+                display: flex; height: 100%;
             }
 
             /* Map takes remaining space */
@@ -970,8 +978,12 @@
            iPad mini LAYOUT (768px - 1150px)
            ======================================== */
         @media (min-width: 768px) and (max-width: 1150px) {
-            /* Header - compact */
-            .header { height: calc(env(safe-area-inset-top, 0px) + 48px); }
+            /* Header - compact with fixed padding for status bar */
+            .header {
+                min-height: 48px;
+                padding-top: 20px;
+                padding-top: max(20px, env(safe-area-inset-top, 20px));
+            }
 
             /* Tabs - compact */
             .tab { padding: 6px 14px; font-size: 13px; }
@@ -979,9 +991,6 @@
 
             /* Header time - compact */
             .header-tablet-clock { font-size: 17px; }
-
-            /* Content height adjustment */
-            #long-content.active { height: calc(100vh - 48px - env(safe-area-inset-top, 0px)); }
 
             /* Map markers - compact */
             .navi-filter-btn { font-size: 12px; padding: 6px 12px; }
