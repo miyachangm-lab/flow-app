@@ -414,116 +414,146 @@
         .breakdown-value { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: white; }
         .breakdown-pct { font-size: 10px; color: var(--gray-500); }
 
-        /* Hotspot Tab Styles */
-        .hotspot-filter-bar {
+        /* Score Map (Spot Tab) Styles */
+        .score-map-wrap { display: flex; height: 100%; width: 100%; }
+        .score-map-side { flex: 1; position: relative; }
+        #score-map { width: 100%; height: 100%; }
+        .score-map-wrap .leaflet-tile-pane { filter: brightness(0.5) saturate(0.3) contrast(1.2); }
+
+        /* Top control bar */
+        .score-bar {
+            position: absolute; top: 0; left: 0; right: 0; z-index: 800;
+            padding: 8px 14px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            background: linear-gradient(180deg, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.7) 85%, transparent 100%);
+            pointer-events: none;
+        }
+        .score-bar > * { pointer-events: auto; }
+
+        /* Time stepper */
+        .score-time-wrap { display: flex; align-items: center; gap: 0; }
+        .score-time-btn {
+            width: 32px; height: 32px; border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.15); background: rgba(15,23,42,0.8);
+            color: var(--gray-400); font-size: 1em; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+        }
+        .score-time-btn:active { background: rgba(0,230,118,0.15); color: #00e676; }
+        .score-time-val {
+            font-family: 'JetBrains Mono', 'Inter', monospace; font-size: 1.3em; font-weight: 700;
+            color: #fff; min-width: 60px; text-align: center;
+        }
+
+        /* Day & mode pills */
+        .score-pgroup {
+            display: flex; gap: 2px; background: rgba(15,23,42,0.7);
+            border-radius: 8px; padding: 2px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .score-pb {
+            padding: 5px 10px; border-radius: 6px; border: none; background: transparent;
+            color: var(--gray-400); font-size: 0.7em; cursor: pointer; font-weight: 500; transition: all 0.15s;
+        }
+        .score-pb.d-on { background: rgba(0,230,118,0.2); color: #fff; font-weight: 700; }
+        .score-pb.m-gem { background: rgba(52,211,153,0.2); color: #34d399; font-weight: 700; }
+        .score-pb.m-std { background: rgba(34,211,238,0.2); color: #22d3ee; font-weight: 700; }
+
+        /* Direction hint */
+        .score-dir-hint {
+            position: absolute; bottom: 14px; left: 14px; z-index: 800;
+            background: rgba(15,23,42,0.92); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 10px 14px; display: none; backdrop-filter: blur(8px);
+        }
+        .score-dir-hint.show { display: flex; align-items: center; gap: 10px; }
+        .score-dir-arrow { font-size: 1.8em; line-height: 1; }
+        .score-dir-text { font-size: 0.78em; line-height: 1.4; }
+        .score-dir-text .area { font-weight: 700; color: #34d399; }
+        .score-dir-text .dist { font-family: 'JetBrains Mono', monospace; color: #22d3ee; }
+
+        /* Map pins */
+        .score-pin {
+            position: relative; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #fff;
+            border: 2.5px solid rgba(255,255,255,0.3); transition: transform 0.15s;
+        }
+        .score-pin.p1 { width: 48px; height: 48px; font-size: 16px; box-shadow: 0 0 24px rgba(239,68,68,0.6); animation: scorePulse 2s infinite; border-color: rgba(255,255,255,0.5); }
+        .score-pin.p2 { width: 42px; height: 42px; font-size: 14px; box-shadow: 0 0 18px rgba(249,115,22,0.5); border-color: rgba(255,255,255,0.4); }
+        .score-pin.p3 { width: 38px; height: 38px; font-size: 13px; box-shadow: 0 0 14px rgba(34,211,238,0.4); }
+        .score-pin.p4 { width: 30px; height: 30px; font-size: 11px; opacity: 0.7; box-shadow: 0 0 8px rgba(99,102,241,0.3); }
+        .score-pin.p-known { width: 20px; height: 20px; font-size: 0; opacity: 0.3; border: 1px solid rgba(100,116,139,0.3); box-shadow: none; }
+        .score-pin.sel { border-color: #fff; transform: scale(1.3); z-index: 999 !important; }
+        .score-plbl {
+            position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 3px;
+            white-space: nowrap; font-size: 10px; font-weight: 700; color: #fff;
+            text-shadow: 0 1px 4px rgba(0,0,0,1); background: rgba(15,23,42,0.6);
+            padding: 1px 5px; border-radius: 3px; pointer-events: none;
+        }
+        @keyframes scorePulse { 0%,100%{box-shadow:0 0 24px rgba(239,68,68,0.5)}50%{box-shadow:0 0 36px rgba(239,68,68,0.8)} }
+
+        /* Sidebar */
+        .score-sidebar {
+            width: 260px; flex-shrink: 0; display: flex; flex-direction: column;
+            background: var(--navy); border-left: 1px solid rgba(255,255,255,0.1);
+        }
+        .score-sb-head {
+            padding: 10px 12px 6px; display: flex; justify-content: space-between;
+            align-items: center; flex-shrink: 0;
+        }
+        .score-sb-head .ttl { font-size: 0.78em; font-weight: 700; }
+        .score-sb-head .cnt { font-family: 'JetBrains Mono', monospace; font-size: 0.68em; color: var(--gray-400); }
+        .score-sb-list { flex: 1; overflow-y: auto; padding: 0 6px 16px; -webkit-overflow-scrolling: touch; }
+        .score-sb-list::-webkit-scrollbar { width: 2px; }
+        .score-sb-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 1px; }
+
+        /* List items */
+        .score-li {
+            padding: 9px 10px; margin: 2px 0; border-radius: 10px;
+            border: 1px solid transparent; cursor: pointer; transition: all 0.12s;
             display: flex; align-items: center; gap: 8px;
-            padding: 10px 16px; background: var(--navy-light);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .hotspot-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 6px 12px; border-radius: 20px;
-            font-size: 12px; font-weight: 600;
+        .score-li:hover { background: rgba(255,255,255,0.02); }
+        .score-li.sel { background: rgba(0,230,118,0.06); border-color: rgba(0,230,118,0.2); }
+        .score-li .rk { width: 22px; text-align: center; flex-shrink: 0; }
+        .score-li .rk span { font-family: 'JetBrains Mono', monospace; font-size: 0.75em; font-weight: 700; }
+        .score-li .rk.top .medal {
+            width: 20px; height: 20px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 0.7em; font-weight: 900; color: #fff;
         }
-        .hotspot-badge.time {
-            background: rgba(0,230,118,0.15); color: #00e676;
-            border: 1px solid rgba(0,230,118,0.3);
+        .score-li .mid { flex: 1; min-width: 0; }
+        .score-li .nm { font-size: 0.85em; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .score-li .tg { font-size: 0.6em; margin-top: 2px; color: var(--gray-400); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .score-li .sv { text-align: right; flex-shrink: 0; }
+        .score-li .sv .n { font-family: 'JetBrains Mono', monospace; font-size: 1.3em; font-weight: 700; line-height: 1; }
+        .score-li .sv .u { font-size: 0.5em; color: var(--gray-400); }
+        .score-sep { padding: 6px 10px; font-size: 0.62em; color: var(--gray-400); opacity: 0.5; margin-top: 4px; }
+
+        /* Expanded detail */
+        .score-dtl {
+            display: none; padding: 8px 10px 10px; margin: -1px 6px 4px;
+            background: var(--navy-light); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0 0 10px 10px; font-size: 0.72em; line-height: 1.6;
         }
-        .hotspot-badge.day {
-            background: rgba(148,163,184,0.15); color: var(--gray-300);
-            border: 1px solid rgba(148,163,184,0.2);
+        .score-dtl.show { display: block; }
+        .score-dtl .rs { color: var(--gray-400); margin-bottom: 6px; }
+        .score-dtl .bdr { display: flex; gap: 4px; flex-wrap: wrap; }
+        .score-dtl .bd { padding: 3px 8px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; font-weight: 600; }
+        .score-dtl .rl { margin-top: 5px; font-size: 0.9em; }
+
+        /* GPS button */
+        .score-gps-btn {
+            width: 36px; height: 36px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.15); background: rgba(15,23,42,0.8);
+            color: var(--gray-400); font-size: 1.2em; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; margin-left: auto;
         }
-        .hotspot-pulse-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: #00e676;
-            animation: hotspotPulse 1.5s ease-in-out infinite;
+        .score-gps-btn:active { background: rgba(0,230,118,0.15); }
+
+        /* Mobile: hide sidebar, show bottom sheet style */
+        @media (max-width: 767px) {
+            .score-map-wrap { flex-direction: column; }
+            .score-sidebar { width: 100%; height: 45%; border-left: none; border-top: 1px solid rgba(255,255,255,0.1); }
+            .score-bar { padding: 6px 10px; gap: 8px; }
+            .score-time-val { font-size: 1.1em; min-width: 50px; }
+            .score-pb { padding: 4px 8px; font-size: 0.65em; }
         }
-        @keyframes hotspotPulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
-        }
-        .hotspot-count {
-            margin-left: auto; font-size: 11px; color: var(--gray-400);
-        }
-        .hotspot-recommend {
-            position: absolute; top: 16px; right: 16px; z-index: 1000;
-            background: rgba(10,10,20,0.88); backdrop-filter: blur(12px);
-            border-radius: 12px; padding: 14px 18px;
-            border: 1px solid rgba(255,255,255,0.1);
-            min-width: 160px;
-        }
-        .hotspot-recommend-label {
-            font-size: 11px; color: #00e676; font-weight: 600;
-            margin-bottom: 6px; display: flex; align-items: center; gap: 4px;
-        }
-        .hotspot-recommend-area {
-            font-size: 20px; font-weight: 900; color: white; margin-bottom: 4px;
-        }
-        .hotspot-recommend-detail {
-            font-size: 11px; color: var(--gray-400);
-        }
-        .hotspot-insight {
-            background: var(--navy-light);
-            border: 1px solid rgba(0,230,118,0.3);
-            border-radius: 12px; padding: 14px 16px;
-            margin: 12px 16px;
-        }
-        .hotspot-insight-header {
-            display: flex; align-items: center; gap: 6px;
-            font-size: 12px; color: #00e676; font-weight: 600; margin-bottom: 8px;
-        }
-        .hotspot-insight-text {
-            font-size: 13px; color: var(--gray-300); line-height: 1.6;
-        }
-        .hotspot-empty {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; height: 300px; color: var(--gray-400);
-            text-align: center; padding: 20px;
-        }
-        .hotspot-empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-        .hotspot-empty-text { font-size: 14px; margin-bottom: 8px; }
-        .hotspot-empty-sub { font-size: 12px; color: var(--gray-500); }
-        .hotspot-circle-label {
-            font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 900;
-            color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-        }
-        .hotspot-area-label {
-            font-size: 10px; font-weight: 600; color: white;
-            background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px;
-            white-space: nowrap;
-        }
-        .hotspot-legend {
-            position: absolute; bottom: 20px; left: 16px; z-index: 1000;
-            background: rgba(10,10,20,0.88); backdrop-filter: blur(12px);
-            border-radius: 10px; padding: 12px 14px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .hotspot-legend-title {
-            font-size: 10px; color: var(--gray-400); text-transform: uppercase;
-            letter-spacing: 1px; margin-bottom: 8px; font-weight: 600;
-        }
-        .hotspot-legend-item {
-            display: flex; align-items: center; gap: 8px;
-            margin-bottom: 6px; font-size: 11px; color: var(--gray-300);
-        }
-        .hotspot-legend-item:last-child { margin-bottom: 0; }
-        .hotspot-legend-circle {
-            width: 14px; height: 14px; border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.5);
-        }
-        .hotspot-legend-circle.high { background: rgba(0,230,118,0.4); border-color: #00e676; }
-        .hotspot-legend-circle.medium { background: rgba(255,183,77,0.3); border-color: #ffb74d; }
-        .hotspot-legend-circle.low { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.4); }
-        .hotspot-location-btn {
-            position: absolute; bottom: 85px; right: 16px; z-index: 1000;
-            width: 44px; height: 44px; border-radius: 50%;
-            background: rgba(10,10,20,0.88); backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s;
-        }
-        .hotspot-location-btn:active { transform: scale(0.95); }
-        .hotspot-location-btn svg { width: 22px; height: 22px; }
         .current-location-marker {
             width: 16px; height: 16px; border-radius: 50%;
             background: #4285f4; border: 3px solid white;
@@ -1251,43 +1281,40 @@
         </div>
     </div>
 
-    <!-- Hotspot Tab Content -->
+    <!-- Score Map Tab Content -->
     <div class="content" id="apps-content">
-        <div class="map-container">
-            <div class="hotspot-filter-bar" id="hotspot-filter-bar">
-                <div class="hotspot-badge time">
-                    <div class="hotspot-pulse-dot"></div>
-                    <span id="hotspot-time-range">--:-- 〜 --:--</span>
+        <div class="score-map-wrap">
+            <div class="score-map-side">
+                <div id="score-map"></div>
+                <div class="score-bar">
+                    <div class="score-time-wrap">
+                        <button class="score-time-btn" onclick="scoreStepTime(-1)">◀</button>
+                        <span class="score-time-val" id="scoreTimeVal">21:00</span>
+                        <button class="score-time-btn" onclick="scoreStepTime(1)">▶</button>
+                    </div>
+                    <div class="score-pgroup">
+                        <button class="score-pb d-on" data-d="weekday" onclick="scoreSetDay('weekday')">平日</button>
+                        <button class="score-pb" data-d="friday" onclick="scoreSetDay('friday')">金曜</button>
+                        <button class="score-pb" data-d="weekend" onclick="scoreSetDay('weekend')">土日</button>
+                        <button class="score-pb" data-d="event" onclick="scoreSetDay('event')">ｲﾍﾞﾝﾄ</button>
+                    </div>
+                    <div class="score-pgroup">
+                        <button class="score-pb m-gem" id="scoreModeAnaba" onclick="scoreSetMode('anaba')">💎 穴場</button>
+                        <button class="score-pb" id="scoreModeStd" onclick="scoreSetMode('std')">総合</button>
+                    </div>
+                    <button class="score-gps-btn" onclick="scoreGoGPS()" title="現在地">📍</button>
                 </div>
-                <div class="hotspot-badge day" id="hotspot-day">--曜</div>
-                <div class="hotspot-count" id="hotspot-count">過去の同条件 0件</div>
-            </div>
-            <div style="position: relative; flex: 1;">
-                <div id="map"></div>
-                <div class="hotspot-recommend" id="hotspot-recommend" style="display: none;">
-                    <div class="hotspot-recommend-label">🎯 今のおすすめ</div>
-                    <div class="hotspot-recommend-area" id="hotspot-recommend-area">--</div>
-                    <div class="hotspot-recommend-detail" id="hotspot-recommend-detail">-- 件</div>
-                </div>
-                <div class="hotspot-legend">
-                    <div class="hotspot-legend-title">乗車実績</div>
-                    <div class="hotspot-legend-item"><div class="hotspot-legend-circle high"></div><span>3回以上</span></div>
-                    <div class="hotspot-legend-item"><div class="hotspot-legend-circle medium"></div><span>2回</span></div>
-                    <div class="hotspot-legend-item"><div class="hotspot-legend-circle low"></div><span>1回</span></div>
-                </div>
-                <div class="hotspot-location-btn" id="hotspot-location-btn" onclick="goToCurrentLocation()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#4285f4" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"/>
-                        <line x1="12" y1="2" x2="12" y2="6"/>
-                        <line x1="12" y1="18" x2="12" y2="22"/>
-                        <line x1="2" y1="12" x2="6" y2="12"/>
-                        <line x1="18" y1="12" x2="22" y2="12"/>
-                    </svg>
+                <div class="score-dir-hint" id="scoreDirHint">
+                    <div class="score-dir-arrow" id="scoreDirArrow">↗</div>
+                    <div class="score-dir-text">最寄り穴場: <span class="area" id="scoreDirArea">--</span><br><span class="dist" id="scoreDirDist">--</span></div>
                 </div>
             </div>
-            <div class="hotspot-insight" id="hotspot-insight" style="display: none;">
-                <div class="hotspot-insight-header">💡 インサイト</div>
-                <div class="hotspot-insight-text" id="hotspot-insight-text"></div>
+            <div class="score-sidebar">
+                <div class="score-sb-head">
+                    <span class="ttl" id="scoreSbLabel">💎 穴場ランキング</span>
+                    <span class="cnt" id="scoreSbCount">--</span>
+                </div>
+                <div class="score-sb-list" id="scoreSbList"></div>
             </div>
         </div>
     </div>
@@ -1836,7 +1863,7 @@
             }
 
             if (tabName === 'apps') {
-                setTimeout(() => { initAppMap(); if (appMap) appMap.invalidateSize(); }, 200);
+                setTimeout(() => { initScoreMap(); if (scoreMap) scoreMap.invalidateSize(); }, 200);
             } else if (tabName === 'long') {
                 setTimeout(() => { initLongMap(); if (longMap) longMap.invalidateSize(); }, 200);
             } else if (tabName === 'dashboard') {
@@ -1956,289 +1983,211 @@
     LONG_RIDES.forEach(r => r.period = getPeriod(r.time));
     const PERIOD_LABELS = { morning: '🌅 朝', day: '☀️ 昼', evening: '🌆 夜', night: '🌙 深夜' };
 
-    let appMap = null, hotspotLayers = [], currentLocationMarker = null;
-    let hotspotData = [];
+    // ========================================
+    // SCORE MAP (Spot Tab) - 穴場スコアリング
+    // ========================================
+    let scoreMap = null, scoreMarkerLayer = null, scoreMyPos = null;
+    let scoreDay = 'weekday', scoreMode = 'anaba', scoreHour = 21, scoreSelId = null;
 
-    // Get current time slot (2-hour window)
-    function getTimeSlot() {
-        const now = new Date();
-        const h = now.getHours();
-        const startHour = Math.floor(h / 2) * 2;
-        const endHour = startHour + 2;
-        return {
-            start: startHour,
-            end: endHour,
-            label: `${startHour}:00 〜 ${endHour === 24 ? '0' : endHour}:00`
-        };
+    // エリアデータ（定番 k:true / 穴場 k:false）
+    const SCORE_POINTS = [
+        {id:'kitashinchi',lat:34.6963,lng:135.4983,name:'北新地',k:true,flow:{b:85,n:95,m:20},sup:85,pat:90,real:{rides:42,gap:35,fare:3057,h:{19:3,20:5,21:8,22:7,23:6,0:5,1:5,2:3}},tags:h=>h>=21||h<2?'流し激戦 / 高単価':'乗り場待ち',rsn:h=>h>=21?'高単価¥3,057だが待ち35分。供給過多。':'定番。競合多い。'},
+        {id:'namba',lat:34.6685,lng:135.5013,name:'難波',k:true,flow:{b:80,n:88,m:25},sup:80,pat:82,real:{rides:12,gap:30,fare:2800,h:{19:2,20:2,21:3,22:2,23:2,0:1}},tags:()=>'観光客 / 競合多',rsn:()=>'外国人多いが供給も多い。短距離中心。'},
+        {id:'umeda',lat:34.7006,lng:135.496,name:'梅田',k:true,flow:{b:90,n:85,m:40},sup:88,pat:88,real:{rides:35,gap:32,fare:2357,h:{18:4,19:5,20:3,21:4,22:5,23:4,0:4,1:3,2:3}},tags:h=>h>=23?'終電後ﾛﾝｸﾞ':'競合最多',rsn:h=>h>=23?'終電後ﾛﾝｸﾞ需要。供給最多。':'大阪最大需要。競合も最大。'},
+        {id:'shinsaibashi',lat:34.677,lng:135.506,name:'心斎橋',k:true,flow:{b:70,n:78,m:22},sup:65,pat:72,real:{rides:22,gap:28,fare:1936,h:{20:3,21:5,22:4,23:3,0:3,1:2,2:2}},tags:()=>'短距離多',rsn:()=>'需要あるが供給多い。単価¥1,936低め。'},
+        {id:'fukushima',lat:34.6912,lng:135.4865,name:'福島',k:false,flow:{b:45,n:55,m:35},sup:18,pat:55,real:{rides:6,gap:18,fare:2367,h:{19:1,20:2,21:2,22:1}},tags:h=>h>=19&&h<23?'💎供給薄 / ｱﾌﾟﾘ33%':'💎関テレ法人',rsn:h=>h>=19?'梅田隣接で供給薄。空き18分。ｱﾌﾟﾘ率33%最高。':'関テレ・ABCの法人配車。'},
+        {id:'nakanoshima',lat:34.692,lng:135.502,name:'中之島',k:false,flow:{b:48,n:42,m:50},sup:10,pat:52,real:{rides:7,gap:15,fare:4000,h:{19:3,20:2,21:1,22:1}},tags:h=>h>=19&&h<21?'💎¥4,000 / 空き15分':'💎供給ゼロ / 法人',rsn:h=>h>=19?'¥4,000×空き15分。法人ﾁｹｯﾄ。最高効率。':'関電・朝日・日銀。供給ゼロ。'},
+        {id:'kyobashi',lat:34.6953,lng:135.526,name:'京橋',k:false,flow:{b:52,n:48,m:55},sup:22,pat:55,real:{rides:5,gap:12,fare:3960,h:{1:2,2:2,23:1}},tags:h=>h>=1&&h<3?'💎深夜ﾛﾝｸﾞ¥3,960':'💎OBP / 飲食街',rsn:h=>h>=1?'深夜ﾛﾝｸﾞ¥3,960。空き12分。':'OBP+京橋飲食街。'},
+        {id:'honmachi',lat:34.686,lng:135.5005,name:'本町',k:false,flow:{b:60,n:50,m:55},sup:30,pat:62,real:{rides:14,gap:28,fare:3450,h:{19:2,20:2,21:3,22:2,0:2,1:2,2:1}},tags:h=>h>=19?'💎法人ﾁｹｯﾄ¥3,450':'💎堺筋裏道',rsn:h=>h>=19?'法人ﾁｹｯﾄ客。単価¥3,450。':'堺筋裏道で配車独占。'},
+        {id:'tennoji',lat:34.653,lng:135.5133,name:'天王寺',k:false,flow:{b:58,n:45,m:42},sup:25,pat:52,real:{rides:8,gap:25,fare:1800,h:{16:2,17:2,18:2,19:1,20:1}},tags:h=>h>=9&&h<14?'💎病院独占':'堺方面ﾛﾝｸﾞ',rsn:h=>h>=9&&h<14?'赤十字・市大病院。乗り場なし→ｱﾌﾟﾘ独占。':'堺方面ﾛﾝｸﾞ。供給少なめ。'},
+        {id:'tanimachi',lat:34.683,lng:135.519,name:'谷町',k:false,flow:{b:42,n:35,m:48},sup:12,pat:48,real:{rides:4,gap:22,fare:1550,h:{21:2,22:1,23:1}},tags:()=>'💎供給極薄 / ﾀﾜﾏﾝ',rsn:()=>'府庁・NHK周辺。ﾀﾜﾏﾝ配車。奈良ﾛﾝｸﾞも。'},
+        {id:'shin_osaka',lat:34.733,lng:135.5,name:'新大阪',k:false,flow:{b:50,n:45,m:58},sup:20,pat:55,real:{rides:2,gap:20,h:{19:1,20:1}},tags:h=>h>=6&&h<10?'💎新幹線 / ﾎﾃﾙ':'💎西中島飲食',rsn:h=>h>=6&&h<10?'ﾎﾃﾙ→新幹線の朝需要。':'西中島飲食街。供給少ない。'},
+        {id:'juso',lat:34.72,lng:135.48,name:'十三',k:false,flow:{b:35,n:38,m:30},sup:15,pat:35,real:{rides:6,gap:22,h:{19:1,20:2,21:1,22:1,1:1}},tags:h=>h>=20?'💎飲み屋街':'住宅配車',rsn:h=>h>=20?'十三飲食街。梅田ほど供給なし。':'住宅地のｱﾌﾟﾘ配車。'},
+        {id:'temma',lat:34.705,lng:135.512,name:'天満',k:false,flow:{b:42,n:40,m:35},sup:20,pat:42,real:{rides:5,gap:25,h:{22:2,23:1,0:1,1:1}},tags:h=>h>=22?'💎天神橋筋':'裁判所 / 官公庁',rsn:h=>h>=22?'天神橋筋飲食街。競合少ない。':'裁判所・官公庁。'},
+        {id:'usj',lat:34.6655,lng:135.432,name:'USJ方面',k:false,flow:{b:55,n:45,m:20},sup:15,pat:50,real:{rides:0},tags:h=>h>=17&&h<21?'💎逆張り / 競合ゼロ':'USJ観光',rsn:h=>h>=17?'USJ帰り→桜島で北港通り独占。':'USJ観光客需要。'},
+        {id:'bentencho',lat:34.674,lng:135.463,name:'弁天町',k:false,flow:{b:32,n:22,m:35},sup:8,pat:35,real:{rides:1,h:{18:1}},tags:()=>'💎供給ゼロ / 高齢者',rsn:()=>'弁天町駅以外は交通手段なし。競合ゼロ。'},
+        {id:'taisho',lat:34.6555,lng:135.4695,name:'大正区',k:false,flow:{b:28,n:20,m:30},sup:5,pat:30,real:{rides:0},tags:(h,d)=>d==='event'?'💎ﾄﾞｰﾑ特需':'💎陸の孤島 / 競合ゼロ',rsn:(h,d)=>d==='event'?'京セラﾄﾞｰﾑ試合日特需。':'橋の向こう。鳴れば100%自分。'},
+        {id:'miyakojima',lat:34.71,lng:135.523,name:'都島',k:false,flow:{b:35,n:25,m:40},sup:10,pat:38,real:{rides:2,gap:20,h:{1:1,19:1}},tags:h=>h>=9&&h<14?'💎病院集中':'💎住宅ﾛﾝｸﾞ',rsn:()=>'市立総合医療ｾﾝﾀｰ。守口・門真ﾛﾝｸﾞ。'},
+        {id:'suminoe',lat:34.632,lng:135.442,name:'住之江',k:false,flow:{b:25,n:15,m:30},sup:5,pat:28,real:{rides:0},tags:h=>h>=10&&h<16?'💎ｲﾝﾃｯｸｽ / 供給ゼロ':'💎交通空白',rsn:()=>'ﾆｭｰﾄﾗﾑのみ。ｲﾝﾃｯｸｽ展示会特需。'},
+        {id:'konohana',lat:34.679,lng:135.443,name:'此花',k:false,flow:{b:22,n:15,m:28},sup:3,pat:25,real:{rides:0},tags:()=>'💎ﾀｸｼｰ砂漠 / 工場',rsn:()=>'24時間ﾀｸｼｰゼロ。工場配車。USJ連携。'},
+    ];
+
+    // 時間帯係数
+    function scoreTimeMod(h) {
+        if (h >= 21 && h < 24) return { n: 1, m: 0.1 };
+        if (h >= 19 && h < 21) return { n: 0.8, m: 0.15 };
+        if (h >= 0 && h < 3) return { n: 0.7, m: 0.05 };
+        if (h >= 3 && h < 6) return { n: 0.1, m: 0.05 };
+        if (h >= 6 && h < 10) return { n: 0.1, m: 1 };
+        if (h >= 10 && h < 14) return { n: 0.15, m: 0.7 };
+        if (h >= 14 && h < 17) return { n: 0.2, m: 0.5 };
+        return { n: 0.5, m: 0.3 };
     }
 
-    // Get current day of week
-    function getDayOfWeek() {
-        const now = new Date();
-        return {
-            index: now.getDay(),
-            name: DAY_NAMES[now.getDay()]
-        };
+    // 曜日係数
+    function scoreDayMod(d) {
+        return d === 'friday' ? 1.15 : d === 'weekend' ? 0.7 : d === 'event' ? 1.3 : 1;
     }
 
-    // Initialize hotspot map
-    function initAppMap() {
-        if (appMap) return;
-        appMap = L.map('map', { center: [34.6937, 135.5023], zoom: 13, zoomControl: false });
-        L.control.zoom({ position: 'topright' }).addTo(appMap);
-        L.tileLayer('https://tile.openstreetmap.jp/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap © CartoDB', maxZoom: 19
-        }).addTo(appMap);
-        fetchHotspotData();
-    }
-
-    // Fetch hotspot data from Supabase
-    async function fetchHotspotData() {
-        const timeSlot = getTimeSlot();
-        const dayOfWeek = getDayOfWeek();
-
-        // Update UI
-        document.getElementById('hotspot-time-range').textContent = timeSlot.label;
-        document.getElementById('hotspot-day').textContent = dayOfWeek.name + '曜';
-
-        if (!sb) {
-            renderHotspotMap([]);
-            return;
+    // スコア計算
+    function scoreCalc(p) {
+        const t = scoreTimeMod(scoreHour), d = scoreDayMod(scoreDay), hh = Math.floor(scoreHour) % 24;
+        const fl = Math.min(100, (p.flow.b * 0.3 + p.flow.n * t.n * 0.4 + p.flow.m * t.m * 0.3) * d);
+        const si = Math.max(0, 100 - p.sup * (t.n * 0.7 + 0.3));
+        const pt = Math.min(100, p.pat * (t.n * 0.6 + t.m * 0.4) * d);
+        let rl = 50, rc = 0, rL = '未検証';
+        if (p.real && p.real.rides > 0) {
+            const hr = (p.real.h && p.real.h[hh]) || 0;
+            rc = Math.min(1, p.real.rides / 15); rl = 40;
+            if (hr >= 5) rl += 35; else if (hr >= 3) rl += 25; else if (hr >= 1) rl += 15; else rl -= 10;
+            if (p.real.gap) { if (p.real.gap <= 15) rl += 20; else if (p.real.gap <= 25) rl += 10; else if (p.real.gap >= 35) rl -= 5; }
+            if (p.real.fare) { if (p.real.fare >= 3500) rl += 10; else if (p.real.fare >= 2500) rl += 5; }
+            rl = Math.min(100, Math.max(0, rl));
+            rL = hr >= 3 ? '実績◎' + hr + '回/月' : hr >= 1 ? '実績△' + hr + '回/月' : '他時間帯(計' + p.real.rides + ')';
         }
+        const rw = 0.15 * rc, rem = 1 - rw;
+        let tot;
+        if (scoreMode === 'anaba') {
+            const pen = p.k && p.sup > 50 ? (p.sup - 50) * 0.7 : 0;
+            tot = si * (0.35 * rem / 0.85) + fl * (0.25 * rem / 0.85) + pt * (0.15 * rem / 0.85) + rl * rw - pen;
+        } else {
+            tot = fl * (0.35 * rem / 0.85) + pt * (0.25 * rem / 0.85) + si * (0.15 * rem / 0.85) + rl * rw;
+        }
+        if (scoreDay === 'event') tot = Math.min(100, tot * 1.08);
+        tot = tot > 50 ? 50 + (tot - 50) * 1.8 : 50 - (50 - tot) * 1.8;
+        tot = Math.min(100, Math.max(0, Math.round(tot)));
+        return { total: tot, fl: Math.round(fl), si: Math.round(si), pt: Math.round(pt), rl: Math.round(rl), rc, rL, tags: p.tags(hh, scoreDay), rsn: p.rsn(hh, scoreDay) };
+    }
 
-        try {
-            // Get all logs
-            const { data: logs } = await sb
-                .from('flow_taxi_logs')
-                .select('*')
-                .order('ride_date', { ascending: false });
+    // スコア→色
+    function scoreColor(s) {
+        return s >= 75 ? '#ef4444' : s >= 60 ? '#f97316' : s >= 45 ? '#22d3ee' : s >= 30 ? '#6366f1' : '#475569';
+    }
 
-            if (!logs || logs.length === 0) {
-                renderHotspotMap([]);
+    // 地図初期化
+    function initScoreMap() {
+        if (scoreMap) return;
+        scoreMap = L.map('score-map', { center: [34.693, 135.502], zoom: 13, zoomControl: false, attributionControl: false });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(scoreMap);
+        scoreMarkerLayer = L.layerGroup().addTo(scoreMap);
+
+        // 現在時刻を初期値に
+        const now = new Date();
+        scoreHour = now.getHours();
+        const dayIdx = now.getDay();
+        scoreDay = dayIdx === 5 ? 'friday' : dayIdx === 0 || dayIdx === 6 ? 'weekend' : 'weekday';
+        document.getElementById('scoreTimeVal').textContent = String(scoreHour).padStart(2, '0') + ':00';
+        document.querySelectorAll('.score-pb[data-d]').forEach(b => b.className = b.dataset.d === scoreDay ? 'score-pb d-on' : 'score-pb');
+
+        scoreMap.on('moveend zoomend', () => { clearTimeout(scoreMap._renderTimeout); scoreMap._renderTimeout = setTimeout(renderScoreMap, 200); });
+        renderScoreMap();
+    }
+
+    // 描画
+    function renderScoreMap() {
+        const items = SCORE_POINTS.map(p => ({ ...p, s: scoreCalc(p) }));
+        const gems = items.filter(i => !i.k).sort((a, b) => b.s.total - a.s.total);
+        const knowns = items.filter(i => i.k).sort((a, b) => b.s.total - a.s.total);
+        const ordered = scoreMode === 'anaba' ? [...gems, ...knowns] : items.sort((a, b) => b.s.total - a.s.total);
+
+        // マップピン
+        scoreMarkerLayer.clearLayers();
+        const zoom = scoreMap.getZoom();
+        items.forEach(it => {
+            if (scoreMode === 'anaba' && it.k) {
+                if (zoom < 14) return;
+                const icon = L.divIcon({ className: '', html: '<div class="score-pin p-known" style="background:#334155"></div>', iconSize: [0, 0], iconAnchor: [0, 0] });
+                scoreMarkerLayer.addLayer(L.marker([it.lat, it.lng], { icon, interactive: false }));
                 return;
             }
-
-            // Filter by day of week and time slot
-            const filtered = logs.filter(log => {
-                const logDate = new Date(log.ride_date);
-                if (logDate.getDay() !== dayOfWeek.index) return false;
-
-                if (log.ride_time) {
-                    const h = parseInt(log.ride_time.split(':')[0]);
-                    if (h < timeSlot.start || h >= timeSlot.end) return false;
-                }
-                return true;
+            const c = scoreColor(it.s.total);
+            const gemRank = gems.findIndex(g => g.id === it.id);
+            const sz = gemRank === 0 ? 'p1' : gemRank <= 2 ? 'p2' : it.s.total >= 45 ? 'p3' : 'p4';
+            const sel = it.id === scoreSelId ? 'sel' : '';
+            const showName = zoom >= 12 && (gemRank < 5 || it.s.total >= 50);
+            const icon = L.divIcon({
+                className: '',
+                html: '<div class="score-pin ' + sz + ' ' + sel + '" style="background:' + c + '">' + it.s.total + (showName ? '<span class="score-plbl">' + it.name + '</span>' : '') + '</div>',
+                iconSize: [0, 0], iconAnchor: [0, 0]
             });
-
-            hotspotData = filtered;
-            document.getElementById('hotspot-count').textContent = `過去の同条件 ${filtered.length}件`;
-            renderHotspotMap(filtered);
-        } catch (e) {
-            console.warn('fetchHotspotData error:', e);
-            renderHotspotMap([]);
-        }
-    }
-
-    // Get coordinates for an area
-    function getAreaCoords(areaName) {
-        if (AREA_COORDS[areaName]) return AREA_COORDS[areaName];
-        // Try partial match
-        for (const key in AREA_COORDS) {
-            if (areaName.includes(key) || key.includes(areaName)) {
-                return AREA_COORDS[key];
-            }
-        }
-        return null;
-    }
-
-    // Render hotspot map
-    function renderHotspotMap(logs) {
-        if (!appMap) return;
-
-        // Clear existing layers
-        hotspotLayers.forEach(l => appMap.removeLayer(l));
-        hotspotLayers = [];
-
-        if (!logs || logs.length === 0) {
-            // Show empty state
-            document.getElementById('hotspot-recommend').style.display = 'none';
-            document.getElementById('hotspot-insight').style.display = 'none';
-            return;
-        }
-
-        // Group by area
-        const areaGroups = {};
-        logs.forEach(log => {
-            const area = log.area || '不明';
-            if (!areaGroups[area]) areaGroups[area] = [];
-            areaGroups[area].push(log);
+            const mk = L.marker([it.lat, it.lng], { icon });
+            mk.on('click', () => { scoreSelId = it.id; renderScoreMap(); scoreMap.panTo([it.lat, it.lng]); scrollToScoreItem(it.id); });
+            scoreMarkerLayer.addLayer(mk);
         });
 
-        // Sort areas by count
-        const sortedAreas = Object.entries(areaGroups)
-            .sort((a, b) => b[1].length - a[1].length);
+        // サイドバー
+        document.getElementById('scoreSbLabel').textContent = scoreMode === 'anaba' ? '💎 穴場ランキング' : '📊 総合ランキング';
+        document.getElementById('scoreSbCount').textContent = gems.length + '件';
 
-        // Draw circles for each area
-        sortedAreas.forEach(([area, areaLogs]) => {
-            const coords = getAreaCoords(area);
-            if (!coords) return;
-
-            const count = areaLogs.length;
-            let radius, color, opacity, borderColor;
-
-            if (count >= 3) {
-                radius = 300;
-                color = '#00e676';
-                opacity = 0.25;
-                borderColor = '#00e676';
-            } else if (count === 2) {
-                radius = 200;
-                color = '#ffb74d';
-                opacity = 0.2;
-                borderColor = '#ffb74d';
+        let h = '';
+        let gemsDone = false;
+        ordered.forEach((it, idx) => {
+            const isGem = !it.k;
+            const gemIdx = isGem ? gems.findIndex(g => g.id === it.id) : -1;
+            const rk = scoreMode === 'anaba' ? (isGem ? gemIdx + 1 : '-') : idx + 1;
+            if (scoreMode === 'anaba' && it.k && !gemsDone) { gemsDone = true; h += '<div class="score-sep">── 定番エリア ──</div>'; }
+            const c = scoreColor(it.s.total);
+            const sel = it.id === scoreSelId;
+            const dim = scoreMode === 'anaba' && it.k ? 'opacity:0.4;' : '';
+            let rkHtml;
+            if (isGem && gemIdx < 3) {
+                const mc = ['#ef4444', '#f97316', '#fbbf24'][gemIdx];
+                rkHtml = '<div class="rk top"><div class="medal" style="background:' + mc + '">' + (gemIdx + 1) + '</div></div>';
             } else {
-                radius = 150;
-                color = '#ffffff';
-                opacity = 0.1;
-                borderColor = 'rgba(255,255,255,0.4)';
+                rkHtml = '<div class="rk"><span style="color:var(--gray-400)">' + rk + '</span></div>';
             }
-
-            // Draw circle
-            const circle = L.circle([coords.lat, coords.lng], {
-                radius: radius,
-                fillColor: color,
-                fillOpacity: opacity,
-                color: borderColor,
-                weight: 2
-            }).addTo(appMap);
-            hotspotLayers.push(circle);
-
-            // Add count label
-            const countIcon = L.divIcon({
-                className: '',
-                html: `<div class="hotspot-circle-label">${count}</div>`,
-                iconSize: [30, 20],
-                iconAnchor: [15, 10]
-            });
-            const countMarker = L.marker([coords.lat, coords.lng], { icon: countIcon }).addTo(appMap);
-            hotspotLayers.push(countMarker);
-
-            // Add area label below
-            const labelIcon = L.divIcon({
-                className: '',
-                html: `<div class="hotspot-area-label">${area}</div>`,
-                iconSize: [80, 16],
-                iconAnchor: [40, -5]
-            });
-            const labelMarker = L.marker([coords.lat, coords.lng], { icon: labelIcon }).addTo(appMap);
-            hotspotLayers.push(labelMarker);
-        });
-
-        // Update recommend card
-        if (sortedAreas.length > 0) {
-            const [topArea, topLogs] = sortedAreas[0];
-            const timeSlot = getTimeSlot();
-            document.getElementById('hotspot-recommend').style.display = 'block';
-            document.getElementById('hotspot-recommend-area').textContent = topArea;
-            document.getElementById('hotspot-recommend-detail').textContent = `${topLogs.length}件 / ${timeSlot.label}`;
-        } else {
-            document.getElementById('hotspot-recommend').style.display = 'none';
-        }
-
-        // Generate insight
-        generateInsight(logs, sortedAreas);
-    }
-
-    // Generate insight text
-    function generateInsight(logs, sortedAreas) {
-        if (!logs || logs.length === 0 || sortedAreas.length === 0) {
-            document.getElementById('hotspot-insight').style.display = 'none';
-            return;
-        }
-
-        const dayOfWeek = getDayOfWeek();
-        const timeSlot = getTimeSlot();
-        const timePeriodKey = `${timeSlot.start}-${timeSlot.end}`;
-        const periodLabel = TIME_PERIOD_LABELS[timePeriodKey] || '時間帯';
-
-        // Top area
-        const [topArea, topLogs] = sortedAreas[0];
-
-        // App breakdown
-        const appCounts = { nagashi: 0, uber: 0, didi: 0 };
-        let totalFare = 0;
-        logs.forEach(log => {
-            if (log.app && appCounts.hasOwnProperty(log.app)) {
-                appCounts[log.app]++;
+            h += '<div class="score-li' + (sel ? ' sel' : '') + '" style="' + dim + '" onclick="scoreSelect(\'' + it.id + '\')">' + rkHtml;
+            h += '<div class="mid"><div class="nm">' + it.name + '</div>';
+            h += '<div class="tg">' + it.s.tags + '</div></div>';
+            h += '<div class="sv"><div class="n" style="color:' + c + '">' + it.s.total + '</div></div></div>';
+            if (sel) {
+                const rCol = it.s.rc >= 0.5 ? 'var(--amber)' : it.s.rc > 0 ? 'var(--gray-400)' : '#475569';
+                h += '<div class="score-dtl show"><div class="rs">' + it.s.rsn + '</div>';
+                h += '<div class="bdr"><span class="bd" style="background:rgba(34,211,238,0.1);color:#22d3ee">人流' + it.s.fl + '</span>';
+                h += '<span class="bd" style="background:rgba(52,211,153,0.1);color:#34d399">供給↓' + it.s.si + '</span>';
+                h += '<span class="bd" style="background:rgba(167,139,250,0.1);color:#a78bfa">営業' + it.s.pt + '</span>';
+                h += '<span class="bd" style="background:rgba(251,146,60,0.1);color:#fb923c">実績' + it.s.rl + '</span></div>';
+                h += '<div class="rl" style="color:' + rCol + '">' + (it.s.rc > 0 ? '📊' : '🔍') + ' ' + it.s.rL + '</div></div>';
             }
-            if (log.fare) totalFare += log.fare;
         });
-
-        const avgFare = logs.length > 0 ? Math.round(totalFare / logs.length) : 0;
-        const totalApps = appCounts.nagashi + appCounts.uber + appCounts.didi;
-
-        // Build insight text
-        let text = `${dayOfWeek.name}曜の${periodLabel}は`;
-
-        if (sortedAreas.length > 1) {
-            text += `${topArea}・${sortedAreas[1][0]}エリアで乗車が集中。`;
-        } else {
-            text += `${topArea}エリアで乗車が集中。`;
-        }
-
-        if (totalApps > 0) {
-            const parts = [];
-            if (appCounts.nagashi > 0) parts.push(`流し${appCounts.nagashi}件`);
-            if (appCounts.uber > 0) parts.push(`Uber${appCounts.uber}件`);
-            if (appCounts.didi > 0) parts.push(`DiDi${appCounts.didi}件`);
-            text += `過去${logs.length}件中、${parts.join('/')}`;
-        }
-
-        if (avgFare > 0) {
-            text += `、平均単価¥${avgFare.toLocaleString()}`;
-        }
-
-        document.getElementById('hotspot-insight').style.display = 'block';
-        document.getElementById('hotspot-insight-text').textContent = text;
+        document.getElementById('scoreSbList').innerHTML = h;
+        updateScoreDirHint(gems);
     }
 
-    // Go to current location
-    function goToCurrentLocation() {
-        if (!navigator.geolocation) {
-            alert('位置情報がサポートされていません');
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const lat = position.coords.latitude;
-                const lng = position.coords.longitude;
-
-                if (appMap) {
-                    appMap.setView([lat, lng], 14);
-
-                    // Remove existing marker
-                    if (currentLocationMarker) {
-                        appMap.removeLayer(currentLocationMarker);
-                    }
-
-                    // Add current location marker
-                    const icon = L.divIcon({
-                        className: '',
-                        html: '<div class="current-location-marker"></div>',
-                        iconSize: [22, 22],
-                        iconAnchor: [11, 11]
-                    });
-                    currentLocationMarker = L.marker([lat, lng], { icon }).addTo(appMap);
-                }
-            },
-            (error) => {
-                console.warn('Geolocation error:', error);
-                alert('位置情報を取得できませんでした');
-            },
-            { enableHighAccuracy: true, timeout: 10000 }
-        );
+    function scrollToScoreItem(id) {
+        setTimeout(() => { const el = document.querySelector('.score-li.sel'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 50);
     }
+
+    // 方向ヒント
+    function updateScoreDirHint(gems) {
+        const hint = document.getElementById('scoreDirHint');
+        if (!scoreMyPos || gems.length === 0) { hint.className = 'score-dir-hint'; return; }
+        const top = gems[0];
+        const dlat = (top.lat - scoreMyPos[0]) * 111000;
+        const dlng = (top.lng - scoreMyPos[1]) * 91000;
+        const dist = Math.sqrt(dlat * dlat + dlng * dlng);
+        const angle = Math.atan2(dlng, dlat) * 180 / Math.PI;
+        const arrows = ['↑', '↗', '→', '↘', '↓', '↙', '←', '↖'];
+        const arrow = arrows[Math.round(((angle + 360) % 360) / 45) % 8];
+        document.getElementById('scoreDirArrow').textContent = arrow;
+        document.getElementById('scoreDirArea').textContent = top.name + ' (' + top.s.total + ')';
+        document.getElementById('scoreDirDist').textContent = dist >= 1000 ? (dist / 1000).toFixed(1) + 'km' : Math.round(dist) + 'm';
+        hint.className = 'score-dir-hint show';
+    }
+
+    // コントロール
+    window.scoreSelect = function(id) { scoreSelId = scoreSelId === id ? null : id; const it = SCORE_POINTS.find(p => p.id === id); if (it) scoreMap.panTo([it.lat, it.lng], { animate: true, duration: 0.3 }); renderScoreMap(); };
+    window.scoreStepTime = function(dir) { scoreHour = Math.max(0, Math.min(23, Math.round(scoreHour) + dir)); document.getElementById('scoreTimeVal').textContent = String(scoreHour).padStart(2, '0') + ':00'; renderScoreMap(); };
+    window.scoreSetDay = function(d) { scoreDay = d; document.querySelectorAll('.score-pb[data-d]').forEach(b => b.className = b.dataset.d === d ? 'score-pb d-on' : 'score-pb'); renderScoreMap(); };
+    window.scoreSetMode = function(m) { scoreMode = m; document.getElementById('scoreModeAnaba').className = m === 'anaba' ? 'score-pb m-gem' : 'score-pb'; document.getElementById('scoreModeStd').className = m === 'std' ? 'score-pb m-std' : 'score-pb'; renderScoreMap(); };
+    window.scoreGoGPS = function() {
+        if (navigator.geolocation) navigator.geolocation.getCurrentPosition(p => {
+            scoreMyPos = [p.coords.latitude, p.coords.longitude];
+            scoreMap.setView(scoreMyPos, 13);
+            L.circleMarker(scoreMyPos, { radius: 8, fillColor: '#22d3ee', fillOpacity: 0.9, color: '#fff', weight: 2 }).addTo(scoreMap);
+            renderScoreMap();
+        });
+    };
 
     // ========================================
     // NAVI TAB - Map with Events, Hotels, Long Spots
