@@ -2317,7 +2317,10 @@
         );
     };
     window.scoreNavi = function(lat, lng, name) {
-        window.open('https://map.yahoo.co.jp/navi?lat=' + lat + '&lon=' + lng + '&name=' + encodeURIComponent(name));
+        var url = 'yjcarnavi://navi/select?lat=' + lat + '&lon=' + lng + '&name=' + encodeURIComponent(name);
+        var fallback = 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '&travelmode=driving';
+        var timer = setTimeout(function() { window.location = fallback; }, 1500);
+        window.location = url;
     };
 
     // ========================================
