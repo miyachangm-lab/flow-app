@@ -537,14 +537,33 @@
         .score-dtl .bd { padding: 3px 8px; border-radius: 5px; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; font-weight: 600; }
         .score-dtl .rl { margin-top: 5px; font-size: 0.9em; }
 
-        /* GPS button */
-        .score-gps-btn {
-            width: 36px; height: 36px; border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.15); background: rgba(15,23,42,0.8);
-            color: var(--gray-400); font-size: 1.2em; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; margin-left: auto;
+        /* GPS location button (bottom-left) */
+        .score-location-btn {
+            position: absolute; bottom: 20px; left: 16px; z-index: 800;
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(15,23,42,0.92); backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
         }
-        .score-gps-btn:active { background: rgba(0,230,118,0.15); }
+        .score-location-btn:active { transform: scale(0.95); background: rgba(0,230,118,0.15); }
+        .score-location-btn svg { width: 22px; height: 22px; }
+
+        /* Direction hint (bottom-left, above GPS button) */
+        .score-dir-hint {
+            position: absolute; bottom: 75px; left: 16px; z-index: 800;
+            background: rgba(15,23,42,0.92); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px; padding: 10px 14px; display: none; backdrop-filter: blur(8px);
+            align-items: center; gap: 10px; min-width: 160px;
+        }
+        .score-dir-hint.show { display: flex; }
+        .score-dir-arrow { font-size: 1.6em; line-height: 1; color: #22d3ee; }
+        .score-dir-text { font-size: 0.8em; line-height: 1.4; display: flex; flex-direction: column; gap: 2px; }
+        .score-dir-text .area { font-weight: 700; color: #34d399; font-size: 1.1em; }
+        .score-dir-text .dist { font-family: 'JetBrains Mono', monospace; color: #22d3ee; font-size: 0.9em; }
+
+        /* Distance badge in sidebar */
+        .score-li .dst { font-size: 0.65em; color: var(--gray-500); margin-left: 4px; }
 
         /* Mobile: hide sidebar, show bottom sheet style */
         @media (max-width: 767px) {
@@ -1302,11 +1321,24 @@
                         <button class="score-pb m-gem" id="scoreModeAnaba" onclick="scoreSetMode('anaba')">💎 穴場</button>
                         <button class="score-pb" id="scoreModeStd" onclick="scoreSetMode('std')">総合</button>
                     </div>
-                    <button class="score-gps-btn" onclick="scoreGoGPS()" title="現在地">📍</button>
                 </div>
+                <!-- GPS button (bottom-left) -->
+                <button class="score-location-btn" id="scoreLocationBtn" onclick="scoreGoGPS()" title="現在地">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#4285f4" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <line x1="12" y1="2" x2="12" y2="6"/>
+                        <line x1="12" y1="18" x2="12" y2="22"/>
+                        <line x1="2" y1="12" x2="6" y2="12"/>
+                        <line x1="18" y1="12" x2="22" y2="12"/>
+                    </svg>
+                </button>
+                <!-- Direction hint (bottom-left, above GPS button) -->
                 <div class="score-dir-hint" id="scoreDirHint">
                     <div class="score-dir-arrow" id="scoreDirArrow">↗</div>
-                    <div class="score-dir-text">最寄り穴場: <span class="area" id="scoreDirArea">--</span><br><span class="dist" id="scoreDirDist">--</span></div>
+                    <div class="score-dir-text">
+                        <span class="area" id="scoreDirArea">--</span>
+                        <span class="dist" id="scoreDirDist">--</span>
+                    </div>
                 </div>
             </div>
             <div class="score-sidebar">
@@ -2064,6 +2096,20 @@
         return s >= 75 ? '#ef4444' : s >= 60 ? '#f97316' : s >= 45 ? '#22d3ee' : s >= 30 ? '#6366f1' : '#475569';
     }
 
+    let scoreLocationMarker = null; // 現在地マーカー
+
+    // 距離計算（メートル）
+    function scoreCalcDist(lat1, lng1, lat2, lng2) {
+        const dlat = (lat2 - lat1) * 111000;
+        const dlng = (lng2 - lng1) * 91000;
+        return Math.sqrt(dlat * dlat + dlng * dlng);
+    }
+
+    // 距離フォーマット
+    function scoreFormatDist(m) {
+        return m >= 1000 ? (m / 1000).toFixed(1) + 'km' : Math.round(m) + 'm';
+    }
+
     // 地図初期化
     function initScoreMap() {
         if (scoreMap) return;
@@ -2080,7 +2126,26 @@
         document.querySelectorAll('.score-pb[data-d]').forEach(b => b.className = b.dataset.d === scoreDay ? 'score-pb d-on' : 'score-pb');
 
         scoreMap.on('moveend zoomend', () => { clearTimeout(scoreMap._renderTimeout); scoreMap._renderTimeout = setTimeout(renderScoreMap, 200); });
-        renderScoreMap();
+
+        // GPS自動取得
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    scoreMyPos = [pos.coords.latitude, pos.coords.longitude];
+                    scoreMap.setView(scoreMyPos, 13);
+                    // 現在地マーカー
+                    if (scoreLocationMarker) scoreMap.removeLayer(scoreLocationMarker);
+                    scoreLocationMarker = L.circleMarker(scoreMyPos, {
+                        radius: 8, fillColor: '#4285f4', fillOpacity: 0.9, color: '#fff', weight: 3
+                    }).addTo(scoreMap);
+                    renderScoreMap();
+                },
+                () => { renderScoreMap(); }, // GPS失敗時もレンダリング
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        } else {
+            renderScoreMap();
+        }
     }
 
     // 描画
@@ -2136,8 +2201,14 @@
             } else {
                 rkHtml = '<div class="rk"><span style="color:var(--gray-400)">' + rk + '</span></div>';
             }
+            // 距離計算
+            let distStr = '';
+            if (scoreMyPos) {
+                const dist = scoreCalcDist(scoreMyPos[0], scoreMyPos[1], it.lat, it.lng);
+                distStr = '<span class="dst">' + scoreFormatDist(dist) + '</span>';
+            }
             h += '<div class="score-li' + (sel ? ' sel' : '') + '" style="' + dim + '" onclick="scoreSelect(\'' + it.id + '\')">' + rkHtml;
-            h += '<div class="mid"><div class="nm">' + it.name + '</div>';
+            h += '<div class="mid"><div class="nm">' + it.name + distStr + '</div>';
             h += '<div class="tg">' + it.s.tags + '</div></div>';
             h += '<div class="sv"><div class="n" style="color:' + c + '">' + it.s.total + '</div></div></div>';
             if (sel) {
@@ -2181,12 +2252,20 @@
     window.scoreSetDay = function(d) { scoreDay = d; document.querySelectorAll('.score-pb[data-d]').forEach(b => b.className = b.dataset.d === d ? 'score-pb d-on' : 'score-pb'); renderScoreMap(); };
     window.scoreSetMode = function(m) { scoreMode = m; document.getElementById('scoreModeAnaba').className = m === 'anaba' ? 'score-pb m-gem' : 'score-pb'; document.getElementById('scoreModeStd').className = m === 'std' ? 'score-pb m-std' : 'score-pb'; renderScoreMap(); };
     window.scoreGoGPS = function() {
-        if (navigator.geolocation) navigator.geolocation.getCurrentPosition(p => {
-            scoreMyPos = [p.coords.latitude, p.coords.longitude];
-            scoreMap.setView(scoreMyPos, 13);
-            L.circleMarker(scoreMyPos, { radius: 8, fillColor: '#22d3ee', fillOpacity: 0.9, color: '#fff', weight: 2 }).addTo(scoreMap);
-            renderScoreMap();
-        });
+        if (!navigator.geolocation) return;
+        navigator.geolocation.getCurrentPosition(
+            (p) => {
+                scoreMyPos = [p.coords.latitude, p.coords.longitude];
+                scoreMap.setView(scoreMyPos, 14);
+                // 現在地マーカー更新
+                if (scoreLocationMarker) scoreMap.removeLayer(scoreLocationMarker);
+                scoreLocationMarker = L.circleMarker(scoreMyPos, {
+                    radius: 8, fillColor: '#4285f4', fillOpacity: 0.9, color: '#fff', weight: 3
+                }).addTo(scoreMap);
+                renderScoreMap();
+            },
+            (err) => { console.warn('GPS error:', err); }
+        );
     };
 
     // ========================================
