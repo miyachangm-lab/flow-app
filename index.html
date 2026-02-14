@@ -2098,6 +2098,24 @@
 
     let scoreLocationMarker = null; // 現在地マーカー
 
+    // GPS共通オプション（iPad Safari対応）
+    const SCORE_GPS_OPTIONS = {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000  // 5分間キャッシュ
+    };
+
+    // GPSエラーハンドリング
+    function handleScoreGPSError(err) {
+        console.warn('[ScoreMap GPS Error]', err.code, err.message);
+        const messages = {
+            1: '位置情報を許可してください（設定 > Safari > 位置情報）',
+            2: '位置情報を取得できませんでした',
+            3: '位置情報の取得がタイムアウトしました'
+        };
+        alert(messages[err.code] || '位置情報エラー');
+    }
+
     // 距離計算（メートル）
     function scoreCalcDist(lat1, lng1, lat2, lng2) {
         const dlat = (lat2 - lat1) * 111000;
@@ -2140,8 +2158,8 @@
                     }).addTo(scoreMap);
                     renderScoreMap();
                 },
-                () => { renderScoreMap(); }, // GPS失敗時もレンダリング
-                { enableHighAccuracy: true, timeout: 10000 }
+                (err) => { handleScoreGPSError(err); renderScoreMap(); },
+                SCORE_GPS_OPTIONS
             );
         } else {
             renderScoreMap();
@@ -2264,7 +2282,8 @@
                 }).addTo(scoreMap);
                 renderScoreMap();
             },
-            (err) => { console.warn('GPS error:', err); }
+            handleScoreGPSError,
+            SCORE_GPS_OPTIONS
         );
     };
 
