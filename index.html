@@ -567,7 +567,9 @@
 
         /* Mobile: hide sidebar, show bottom sheet style */
         @media (max-width: 767px) {
-            .score-map-wrap { flex-direction: column; }
+            #apps-content.active { display: block; height: calc(100vh - 80px); }
+            .score-map-wrap { flex-direction: column; height: 100%; }
+            .score-map-side { height: 55%; flex: none; }
             .score-sidebar { width: 100%; height: 45%; border-left: none; border-top: 1px solid rgba(255,255,255,0.1); }
             .score-bar { padding: 6px 10px; gap: 8px; }
             .score-time-val { font-size: 1.1em; min-width: 50px; }
@@ -988,6 +990,11 @@
                 display: flex; height: calc(100vh - 120px);
             }
 
+            /* Spot tab - full height */
+            #apps-content.active {
+                display: block; height: calc(100vh - 120px);
+            }
+
             /* Map takes remaining space */
             .navi-map-wrap {
                 flex: 1; height: 100%; min-height: auto;
@@ -1206,6 +1213,11 @@
 
             /* Navi content height for iPad mini */
             #long-content.active {
+                height: calc(100vh - 140px);
+            }
+
+            /* Spot content height for iPad mini */
+            #apps-content.active {
                 height: calc(100vh - 140px);
             }
 
@@ -1895,7 +1907,13 @@
             }
 
             if (tabName === 'apps') {
-                setTimeout(() => { initScoreMap(); if (scoreMap) scoreMap.invalidateSize(); }, 200);
+                setTimeout(() => {
+                    initScoreMap();
+                    if (scoreMap) {
+                        scoreMap.invalidateSize();
+                        setTimeout(() => scoreMap.invalidateSize(), 300);
+                    }
+                }, 100);
             } else if (tabName === 'long') {
                 setTimeout(() => { initLongMap(); if (longMap) longMap.invalidateSize(); }, 200);
             } else if (tabName === 'dashboard') {
@@ -2145,7 +2163,7 @@
 
         scoreMap.on('moveend zoomend', () => { clearTimeout(scoreMap._renderTimeout); scoreMap._renderTimeout = setTimeout(renderScoreMap, 200); });
 
-        // GPS自動取得
+        // GPS自動取得（初回は静かに失敗）
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
@@ -2157,8 +2175,13 @@
                         radius: 8, fillColor: '#4285f4', fillOpacity: 0.9, color: '#fff', weight: 3
                     }).addTo(scoreMap);
                     renderScoreMap();
+                    scoreMap.invalidateSize();
                 },
-                (err) => { handleScoreGPSError(err); renderScoreMap(); },
+                (err) => {
+                    console.warn('[ScoreMap GPS Error]', err.code, err.message);
+                    renderScoreMap();
+                    scoreMap.invalidateSize();
+                },
                 SCORE_GPS_OPTIONS
             );
         } else {
