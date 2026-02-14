@@ -418,7 +418,7 @@
         .score-map-wrap { display: flex; height: 100%; width: 100%; }
         .score-map-side { flex: 1; position: relative; }
         #score-map { width: 100%; height: 100%; }
-        .score-map-wrap .leaflet-tile-pane { filter: brightness(0.5) saturate(0.3) contrast(1.2); }
+        .score-map-wrap .leaflet-tile-pane { filter: brightness(0.75) saturate(0.5) contrast(1.05); }
 
         /* Top control bar */
         .score-bar {
@@ -520,9 +520,15 @@
         .score-li .mid { flex: 1; min-width: 0; }
         .score-li .nm { font-size: 0.85em; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .score-li .tg { font-size: 0.6em; margin-top: 2px; color: var(--gray-400); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .score-li .sv { text-align: right; flex-shrink: 0; }
+        .score-li .sv { text-align: right; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .score-li .sv .n { font-family: 'JetBrains Mono', monospace; font-size: 1.3em; font-weight: 700; line-height: 1; }
         .score-li .sv .u { font-size: 0.5em; color: var(--gray-400); }
+        .score-li .navi-btn {
+            font-size: 0.7em; padding: 3px 8px; border-radius: 6px;
+            background: rgba(0,230,118,0.15); border: 1px solid rgba(0,230,118,0.3);
+            color: #00e676; cursor: pointer; transition: all 0.15s;
+        }
+        .score-li .navi-btn:active { background: rgba(0,230,118,0.3); transform: scale(0.95); }
         .score-sep { padding: 6px 10px; font-size: 0.62em; color: var(--gray-400); opacity: 0.5; margin-top: 4px; }
 
         /* Expanded detail */
@@ -2251,7 +2257,8 @@
             h += '<div class="score-li' + (sel ? ' sel' : '') + '" style="' + dim + '" onclick="scoreSelect(\'' + it.id + '\')">' + rkHtml;
             h += '<div class="mid"><div class="nm">' + it.name + distStr + '</div>';
             h += '<div class="tg">' + it.s.tags + '</div></div>';
-            h += '<div class="sv"><div class="n" style="color:' + c + '">' + it.s.total + '</div></div></div>';
+            h += '<div class="sv"><div class="n" style="color:' + c + '">' + it.s.total + '</div>';
+            h += '<button class="navi-btn" onclick="event.stopPropagation();scoreNavi(' + it.lat + ',' + it.lng + ',\'' + it.name.replace(/'/g, "\\'") + '\')">🚗</button></div></div>';
             if (sel) {
                 const rCol = it.s.rc >= 0.5 ? 'var(--amber)' : it.s.rc > 0 ? 'var(--gray-400)' : '#475569';
                 h += '<div class="score-dtl show"><div class="rs">' + it.s.rsn + '</div>';
@@ -2308,6 +2315,9 @@
             handleScoreGPSError,
             SCORE_GPS_OPTIONS
         );
+    };
+    window.scoreNavi = function(lat, lng, name) {
+        window.open('https://map.yahoo.co.jp/navi?lat=' + lat + '&lon=' + lng + '&name=' + encodeURIComponent(name));
     };
 
     // ========================================
