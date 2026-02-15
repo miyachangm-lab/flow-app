@@ -1704,12 +1704,20 @@
         'COOL JAPAN PARK OSAKA': { lat: 34.6850, lng: 135.5340 },
     };
 
+    // Yahoo!カーナビ起動（フォールバック: Google Maps）
+    function openYahooNavi(lat, lng, name) {
+        const url = 'yjcarnavi://navi/select?lat=' + lat + '&lon=' + lng + '&name=' + encodeURIComponent(name || '');
+        const fallback = 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '&travelmode=driving';
+        setTimeout(function() { window.location = fallback; }, 1500);
+        window.location = url;
+    }
+
     function openNavi(venue) {
         const coords = VENUE_COORDS[venue];
         if (coords) {
-            // Google Maps directions (works on any device, opens app if installed)
-            window.open(`https://www.google.com/maps/dir/?api=1&destination=${coords.lat},${coords.lng}&destination_place_id=&travelmode=driving`, '_blank');
+            openYahooNavi(coords.lat, coords.lng, venue);
         } else {
+            // 座標不明の場合はGoogle Maps検索
             window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venue + ' 大阪')}`, '_blank');
         }
     }
@@ -2042,8 +2050,81 @@
     // ========================================
     // SCORE MAP (Spot Tab) - 穴場スコアリング
     // ========================================
-    let scoreMap = null, scoreMarkerLayer = null, scoreMyPos = null;
+    let scoreMap = null, scoreMarkerLayer = null, scoreMyPos = null, scoreWatchId = null;
     let scoreDay = 'weekday', scoreMode = 'anaba', scoreHour = 21, scoreSelId = null;
+    let scoreRealData = {}; // ridesテーブルから取得した実績データ
+
+    // pickup名→SCORE_POINTS.idのマッピング（表記揺れ吸収）
+    const PICKUP_ALIASES = {
+        'kitashinchi': ['北新地', 'キタシンチ', '堂島'],
+        'namba': ['難波', 'なんば', 'ナンバ', '南海難波', 'ミナミ'],
+        'umeda': ['梅田', 'ウメダ', '大阪駅', '大阪', '茶屋町'],
+        'shinsaibashi': ['心斎橋', 'シンサイバシ', 'アメ村', 'アメリカ村'],
+        'fukushima': ['福島', 'フクシマ', '関テレ'],
+        'nakanoshima': ['中之島', 'ナカノシマ', '渡辺橋'],
+        'kyobashi': ['京橋', 'キョウバシ', 'OBP'],
+        'honmachi': ['本町', 'ホンマチ', '堺筋本町'],
+        'tennoji': ['天王寺', 'テンノウジ', 'あべの', '阿倍野'],
+        'tanimachi': ['谷町', 'タニマチ', '谷町四丁目', '府庁'],
+        'shin_osaka': ['新大阪', 'シンオオサカ', '西中島'],
+        'juso': ['十三', 'ジュウソウ'],
+        'temma': ['天満', 'テンマ', '天神橋', '扇町'],
+        'usj': ['USJ', 'ユニバ', 'ユニバーサル', '桜島'],
+        'bentencho': ['弁天町', 'ベンテンチョウ'],
+        'taisho': ['大正', 'タイショウ', '京セラドーム', 'ドーム前'],
+        'miyakojima': ['都島', 'ミヤコジマ'],
+        'suminoe': ['住之江', 'スミノエ', 'インテックス'],
+        'konohana': ['此花', 'コノハナ']
+    };
+
+    function pickupToScorePointId(pickupText) {
+        if (!pickupText) return null;
+        const text = pickupText.trim();
+        for (const [id, aliases] of Object.entries(PICKUP_ALIASES)) {
+            if (aliases.some(a => text.includes(a) || a.includes(text))) {
+                return id;
+            }
+        }
+        return null;
+    }
+
+    // ridesテーブルから実績データを取得
+    async function fetchScoreRealData() {
+        if (!sb) return;
+        try {
+            const { data: rides, error } = await sb.from('rides').select('fare, ride_at, pickup');
+            if (error || !rides) {
+                console.warn('rides取得エラー:', error);
+                return;
+            }
+
+            const stats = {};
+            rides.forEach(r => {
+                const id = pickupToScorePointId(r.pickup);
+                if (!id) return;
+
+                if (!stats[id]) stats[id] = { rides: 0, totalFare: 0, hours: {} };
+                stats[id].rides++;
+                stats[id].totalFare += Number(r.fare) || 0;
+
+                const hour = new Date(r.ride_at).getHours();
+                stats[id].hours[hour] = (stats[id].hours[hour] || 0) + 1;
+            });
+
+            // 平均運賃計算
+            Object.values(stats).forEach(s => {
+                s.fare = s.rides > 0 ? Math.round(s.totalFare / s.rides) : 0;
+            });
+
+            scoreRealData = stats;
+            console.log('✅ rides実績:', Object.keys(stats).length + 'エリア', stats);
+
+            // スコア再計算
+            if (scoreMap) renderScoreMap();
+        } catch (err) {
+            console.error('rides取得エラー:', err);
+        }
+    }
 
     // エリアデータ（定番 k:true / 穴場 k:false）
     const SCORE_POINTS = [
@@ -2092,14 +2173,23 @@
         const si = Math.max(0, 100 - p.sup * (t.n * 0.7 + 0.3));
         const pt = Math.min(100, p.pat * (t.n * 0.6 + t.m * 0.4) * d);
         let rl = 50, rc = 0, rL = '未検証';
-        if (p.real && p.real.rides > 0) {
-            const hr = (p.real.h && p.real.h[hh]) || 0;
-            rc = Math.min(1, p.real.rides / 15); rl = 40;
+
+        // ridesテーブルのデータを優先、なければハードコードのp.realを使用
+        const dbReal = scoreRealData[p.id];
+        const realData = dbReal || p.real;
+
+        if (realData && realData.rides > 0) {
+            const hr = (realData.hours && realData.hours[hh]) || (realData.h && realData.h[hh]) || 0;
+            rc = Math.min(1, realData.rides / 15); rl = 40;
             if (hr >= 5) rl += 35; else if (hr >= 3) rl += 25; else if (hr >= 1) rl += 15; else rl -= 10;
-            if (p.real.gap) { if (p.real.gap <= 15) rl += 20; else if (p.real.gap <= 25) rl += 10; else if (p.real.gap >= 35) rl -= 5; }
-            if (p.real.fare) { if (p.real.fare >= 3500) rl += 10; else if (p.real.fare >= 2500) rl += 5; }
+            const gap = realData.gap || (p.real && p.real.gap);
+            if (gap) { if (gap <= 15) rl += 20; else if (gap <= 25) rl += 10; else if (gap >= 35) rl -= 5; }
+            const fare = realData.fare || (p.real && p.real.fare);
+            if (fare) { if (fare >= 3500) rl += 10; else if (fare >= 2500) rl += 5; }
             rl = Math.min(100, Math.max(0, rl));
-            rL = hr >= 3 ? '実績◎' + hr + '回/月' : hr >= 1 ? '実績△' + hr + '回/月' : '他時間帯(計' + p.real.rides + ')';
+            rL = hr >= 3 ? '実績◎' + hr + '回/月' : hr >= 1 ? '実績△' + hr + '回/月' : '他時間帯(計' + realData.rides + ')';
+            // DBデータの場合は「🔄」を付与
+            if (dbReal) rL = '🔄' + rL;
         }
         const rw = 0.15 * rc, rem = 1 - rw;
         let tot;
@@ -2115,9 +2205,9 @@
         return { total: tot, fl: Math.round(fl), si: Math.round(si), pt: Math.round(pt), rl: Math.round(rl), rc, rL, tags: p.tags(hh, scoreDay), rsn: p.rsn(hh, scoreDay) };
     }
 
-    // スコア→色
+    // スコア→色（80↑HOT赤、60↑WARMオレンジ、40↑MID紫、40未満COOL青）
     function scoreColor(s) {
-        return s >= 75 ? '#ef4444' : s >= 60 ? '#f97316' : s >= 45 ? '#22d3ee' : s >= 30 ? '#6366f1' : '#475569';
+        return s >= 80 ? '#ef4444' : s >= 60 ? '#f97316' : s >= 40 ? '#8b5cf6' : '#3b82f6';
     }
 
     let scoreLocationMarker = null; // 現在地マーカー
@@ -2160,6 +2250,9 @@
         L.control.zoom({ position: 'topright' }).addTo(scoreMap);
         scoreMarkerLayer = L.layerGroup().addTo(scoreMap);
 
+        // ridesテーブルから実績データを取得
+        fetchScoreRealData();
+
         // 現在時刻を初期値に
         const now = new Date();
         scoreHour = now.getHours();
@@ -2170,17 +2263,23 @@
 
         scoreMap.on('moveend zoomend', () => { clearTimeout(scoreMap._renderTimeout); scoreMap._renderTimeout = setTimeout(renderScoreMap, 200); });
 
-        // GPS自動取得（初回は静かに失敗）
+        // GPS自動取得（初回は静かに失敗）+ 常時追従
         if (navigator.geolocation) {
+            // 現在地マーカー更新用関数
+            const updateLocationMarker = () => {
+                if (!scoreMap || !scoreMyPos) return;
+                if (scoreLocationMarker) scoreMap.removeLayer(scoreLocationMarker);
+                scoreLocationMarker = L.circleMarker(scoreMyPos, {
+                    radius: 8, fillColor: '#4285f4', fillOpacity: 0.9, color: '#fff', weight: 3
+                }).addTo(scoreMap);
+            };
+
+            // 初回取得
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
                     scoreMyPos = [pos.coords.latitude, pos.coords.longitude];
                     scoreMap.setView(scoreMyPos, 13);
-                    // 現在地マーカー
-                    if (scoreLocationMarker) scoreMap.removeLayer(scoreLocationMarker);
-                    scoreLocationMarker = L.circleMarker(scoreMyPos, {
-                        radius: 8, fillColor: '#4285f4', fillOpacity: 0.9, color: '#fff', weight: 3
-                    }).addTo(scoreMap);
+                    updateLocationMarker();
                     renderScoreMap();
                     scoreMap.invalidateSize();
                 },
@@ -2190,6 +2289,17 @@
                     scoreMap.invalidateSize();
                 },
                 SCORE_GPS_OPTIONS
+            );
+
+            // 常時追従（watchPosition）
+            if (scoreWatchId) navigator.geolocation.clearWatch(scoreWatchId);
+            scoreWatchId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    scoreMyPos = [pos.coords.latitude, pos.coords.longitude];
+                    updateLocationMarker();
+                },
+                () => {},
+                { enableHighAccuracy: true, timeout: 30000, maximumAge: 60000 }
             );
         } else {
             renderScoreMap();
@@ -2215,7 +2325,8 @@
             }
             const c = scoreColor(it.s.total);
             const gemRank = gems.findIndex(g => g.id === it.id);
-            const sz = gemRank === 0 ? 'p1' : gemRank <= 2 ? 'p2' : it.s.total >= 45 ? 'p3' : 'p4';
+            // サイズはスコアベース: 80↑p1、60↑p2、40↑p3、40未満p4
+            const sz = it.s.total >= 80 ? 'p1' : it.s.total >= 60 ? 'p2' : it.s.total >= 40 ? 'p3' : 'p4';
             const sel = it.id === scoreSelId ? 'sel' : '';
             const showName = zoom >= 12 && (gemRank < 5 || it.s.total >= 50);
             const icon = L.divIcon({
@@ -2520,8 +2631,8 @@
         if (longMap) return;
         longMap = L.map('long-map', { center: [34.6937, 135.5023], zoom: 13, zoomControl: false });
         L.control.zoom({ position: 'topright' }).addTo(longMap);
-        L.tileLayer('https://tile.openstreetmap.jp/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap © CartoDB', maxZoom: 19
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '© CartoDB', maxZoom: 18
         }).addTo(longMap);
         fetchNaviEvents();
         initNaviSheetSwipe();
@@ -2764,7 +2875,7 @@
                     iconAnchor: [50, 32]
                 });
                 const marker = L.marker([e.lat, e.lng], { icon }).addTo(longMap);
-                marker.bindPopup(`<div><div class="popup-area">${e.venue}</div><div class="popup-datetime">${e.artist}</div><div class="popup-datetime">終了: ${e.endTime} (${mins}分後)</div><a href="https://www.google.com/maps/dir/?api=1&destination=${e.lat},${e.lng}&travelmode=driving" target="_blank" class="popup-navi-btn">🚗 ナビで行く</a></div>`);
+                marker.bindPopup(`<div><div class="popup-area">${e.venue}</div><div class="popup-datetime">${e.artist}</div><div class="popup-datetime">終了: ${e.endTime} (${mins}分後)</div><button class="popup-navi-btn" onclick="openYahooNavi(${e.lat},${e.lng},'${e.venue.replace(/'/g, "\\'")}')">🚗 ナビで行く</button></div>`);
                 naviMarkers.push(marker);
             });
         }
@@ -2779,7 +2890,7 @@
                     iconAnchor: [50, 32]
                 });
                 const marker = L.marker([h.lat, h.lng], { icon }).addTo(longMap);
-                marker.bindPopup(`<div><div class="popup-area">🏨 ${h.name}</div><div class="popup-datetime">C/O ${h.checkout} / ${h.rooms}室</div><div class="popup-datetime">平均 ¥${h.avgFare.toLocaleString()}</div><a href="https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}&travelmode=driving" target="_blank" class="popup-navi-btn">🚗 ナビで行く</a></div>`);
+                marker.bindPopup(`<div><div class="popup-area">🏨 ${h.name}</div><div class="popup-datetime">C/O ${h.checkout} / ${h.rooms}室</div><div class="popup-datetime">平均 ¥${h.avgFare.toLocaleString()}</div><button class="popup-navi-btn" onclick="openYahooNavi(${h.lat},${h.lng},'${h.name.replace(/'/g, "\\'")}')">🚗 ナビで行く</button></div>`);
                 naviMarkers.push(marker);
             });
         }
@@ -2794,7 +2905,7 @@
                     iconAnchor: [50, 32]
                 });
                 const marker = L.marker([s.lat, s.lng], { icon }).addTo(longMap);
-                marker.bindPopup(`<div><div class="popup-area">💰 ${s.name}</div><div class="popup-datetime">${s.desc}</div><div class="popup-datetime">平均 ¥${s.avgFare.toLocaleString()} / 頻度: ${s.freq}</div><a href="https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=driving" target="_blank" class="popup-navi-btn">🚗 ナビで行く</a></div>`);
+                marker.bindPopup(`<div><div class="popup-area">💰 ${s.name}</div><div class="popup-datetime">${s.desc}</div><div class="popup-datetime">平均 ¥${s.avgFare.toLocaleString()} / 頻度: ${s.freq}</div><button class="popup-navi-btn" onclick="openYahooNavi(${s.lat},${s.lng},'${s.name.replace(/'/g, "\\'")}')">🚗 ナビで行く</button></div>`);
                 naviMarkers.push(marker);
             });
         }
@@ -2887,7 +2998,7 @@
                             ${e.people ? `<span class="navi-card-tag people">👥 ${e.people.toLocaleString()}人</span>` : ''}
                         </div>
                     </div>
-                    <button class="navi-card-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${e.lat},${e.lng}&travelmode=driving')">
+                    <button class="navi-card-btn" onclick="openYahooNavi(${e.lat},${e.lng},'${e.venue.replace(/'/g, "\\'")}')">
                         <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
                     </button>
                 </div>
@@ -2919,7 +3030,7 @@
                             <span class="navi-card-tag fare">平均 ¥${h.avgFare.toLocaleString()}</span>
                         </div>
                     </div>
-                    <button class="navi-card-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}&travelmode=driving')">
+                    <button class="navi-card-btn" onclick="openYahooNavi(${h.lat},${h.lng},'${h.name.replace(/'/g, "\\'")}')">
                         <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
                     </button>
                 </div>
@@ -2938,7 +3049,7 @@
                             <span class="navi-card-tag freq">頻度: ${s.freq}</span>
                         </div>
                     </div>
-                    <button class="navi-card-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=driving')">
+                    <button class="navi-card-btn" onclick="openYahooNavi(${s.lat},${s.lng},'${s.name.replace(/'/g, "\\'")}')">
                         <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
                     </button>
                 </div>
@@ -2986,7 +3097,7 @@
                             ${e.people ? `<span class="navi-sidebar-card-tag people">👥 ${e.people.toLocaleString()}人</span>` : ''}
                         </div>
                     </div>
-                    <button class="navi-sidebar-card-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${e.lat},${e.lng}&travelmode=driving')">
+                    <button class="navi-sidebar-card-btn" onclick="openYahooNavi(${e.lat},${e.lng},'${e.venue.replace(/'/g, "\\'")}')">
                         <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
                     </button>
                 </div>
@@ -3018,7 +3129,7 @@
                             <span class="navi-sidebar-card-tag fare">平均 ¥${h.avgFare.toLocaleString()}</span>
                         </div>
                     </div>
-                    <button class="navi-sidebar-card-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}&travelmode=driving')">
+                    <button class="navi-sidebar-card-btn" onclick="openYahooNavi(${h.lat},${h.lng},'${h.name.replace(/'/g, "\\'")}')">
                         <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
                     </button>
                 </div>
@@ -3039,7 +3150,7 @@
                             <span class="navi-sidebar-card-tag freq">頻度: ${s.freq}</span>
                         </div>
                     </div>
-                    <button class="navi-sidebar-card-btn" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=driving')">
+                    <button class="navi-sidebar-card-btn" onclick="openYahooNavi(${s.lat},${s.lng},'${s.name.replace(/'/g, "\\'")}')">
                         <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
                     </button>
                 </div>
@@ -3223,10 +3334,9 @@
             }
         }
 
-        // Navi button
+        // Navi button (Yahoo!カーナビ優先)
         if (btnEl && top.lat && top.lng) {
-            const naviUrl = `https://www.google.com/maps/dir/?api=1&destination=${top.lat},${top.lng}&travelmode=driving`;
-            btnEl.onclick = () => window.open(naviUrl);
+            btnEl.onclick = () => openYahooNavi(top.lat, top.lng, top.name || '');
         }
     }
 
