@@ -2082,38 +2082,22 @@
     async function fetchScoreRealData() {
         console.log('🔄 [rides連携] fetchScoreRealData開始...');
         if (!sb) {
-            const msg = '❌ [rides連携] Supabaseクライアントが未初期化';
-            console.warn(msg);
-            alert('[rides連携エラー]\n' + msg);
+            console.warn('❌ [rides連携] Supabaseクライアントが未初期化');
             return;
         }
         try {
             console.log('📡 [rides連携] ridesテーブルからデータ取得中...');
-            const { data: rides, error, status, statusText } = await sb.from('rides').select('fare, ride_at, pickup');
-
-            // デバッグ: レスポンス詳細
-            console.log('📡 [rides連携] レスポンス:', { status, statusText, error, dataLength: rides?.length });
+            const { data: rides, error } = await sb.from('rides').select('fare, ride_at, pickup');
 
             if (error) {
-                const errMsg = '❌ [rides連携] クエリエラー\n\ncode: ' + (error.code || 'なし') + '\nmessage: ' + (error.message || 'なし') + '\ndetails: ' + (error.details || 'なし') + '\nhint: ' + (error.hint || 'なし') + '\n\n※RLSポリシーが原因の可能性があります。\nSupabaseでridesテーブルにSELECTのpublicポリシーを追加してください。';
                 console.error('❌ [rides連携] クエリエラー:', error);
-                alert('[rides連携エラー]\n' + errMsg);
                 return;
             }
-            if (!rides) {
-                const msg = '⚠️ ridesテーブルからnullが返されました（RLSポリシー要確認）';
-                console.warn(msg);
-                alert('[rides連携エラー]\n' + msg);
-                return;
-            }
-            if (rides.length === 0) {
-                const msg = '⚠️ ridesテーブルにデータがありません（0件）\n\n※RLSポリシーでブロックされている可能性があります';
-                console.warn(msg);
-                alert('[rides連携]\n' + msg);
+            if (!rides || rides.length === 0) {
+                console.warn('⚠️ [rides連携] ridesテーブルにデータなし');
                 return;
             }
             console.log('📊 [rides連携] 取得件数:', rides.length, '件');
-            alert('✅ [rides連携成功]\n取得件数: ' + rides.length + '件');
 
             // マッピングできなかったpickup名を記録
             const unmapped = new Set();
@@ -2153,9 +2137,7 @@
             // スコア再計算
             if (scoreMap) renderScoreMap();
         } catch (err) {
-            const errMsg = '❌ [rides連携] 例外発生\n\n' + (err.message || err);
             console.error('❌ [rides連携] 例外発生:', err);
-            alert('[rides連携エラー]\n' + errMsg);
         }
     }
 
