@@ -508,6 +508,7 @@
         .score-li .mid { flex: 1; min-width: 0; }
         .score-li .nm { font-size: 0.85em; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .score-li .tg { font-size: 0.6em; margin-top: 2px; color: var(--gray-400); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .score-li .rides-info { font-size: 0.6em; margin-top: 3px; color: #22d3ee; font-weight: 600; }
         .score-li .sv { text-align: right; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .score-li .sv .n { font-family: 'JetBrains Mono', monospace; font-size: 1.3em; font-weight: 700; line-height: 1; }
         .score-li .sv .u { font-size: 0.5em; color: var(--gray-400); }
@@ -2379,9 +2380,13 @@
                 const dist = scoreCalcDist(scoreMyPos[0], scoreMyPos[1], it.lat, it.lng);
                 distStr = '<span class="dst">' + scoreFormatDist(dist) + '</span>';
             }
+            // rides実績表示
+            const dbReal = scoreRealData[it.id];
+            const ridesInfo = dbReal ? '<div class="rides-info">📈実績' + dbReal.rides + '件 平均¥' + dbReal.fare.toLocaleString() + '</div>' : '';
+
             h += '<div class="score-li' + (sel ? ' sel' : '') + '" style="' + dim + '" onclick="scoreSelect(\'' + it.id + '\')">' + rkHtml;
             h += '<div class="mid"><div class="nm">' + it.name + distStr + '</div>';
-            h += '<div class="tg">' + it.s.tags + '</div></div>';
+            h += '<div class="tg">' + it.s.tags + '</div>' + ridesInfo + '</div>';
             h += '<div class="sv"><div class="n" style="color:' + c + '">' + it.s.total + '</div>';
             h += '<button class="navi-btn" onclick="event.stopPropagation();scoreNavi(' + it.lat + ',' + it.lng + ',\'' + it.name.replace(/'/g, "\\'") + '\')">🚗</button></div></div>';
             if (sel) {
