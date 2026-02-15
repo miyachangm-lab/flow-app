@@ -1258,10 +1258,104 @@
         @media (min-width: 1151px) {
             .navi-sidebar { width: 420px; }
         }
+
+        /* ========================================
+           Refresh Toast Notification
+           ======================================== */
+        .refresh-toast {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 12px;
+            color: var(--gray-300);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .refresh-toast.show {
+            opacity: 1;
+        }
+        .refresh-toast.success {
+            color: #22c55e;
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+        .refresh-toast .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top-color: var(--teal-light);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========================================
+           Pull-to-Refresh Indicator
+           ======================================== */
+        .pull-indicator {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 36px;
+            height: 36px;
+            background: var(--navy-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: transform 0.2s, opacity 0.2s;
+            z-index: 100;
+        }
+        .pull-indicator.visible {
+            opacity: 1;
+        }
+        .pull-indicator.ready {
+            transform: translateX(-50%) scale(1.1);
+            border-color: var(--teal);
+        }
+        .pull-indicator.refreshing .pull-arrow {
+            display: none;
+        }
+        .pull-indicator.refreshing::after {
+            content: '';
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top-color: var(--teal-light);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .pull-arrow {
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+        .pull-indicator.ready .pull-arrow {
+            transform: rotate(180deg);
+            color: var(--teal-light);
+        }
     </style>
 </head>
 
 <body>
+    <!-- Refresh Toast -->
+    <div class="refresh-toast" id="refreshToast">
+        <div class="spinner"></div>
+        <span id="refreshToastText">更新中...</span>
+    </div>
     <!-- Header -->
     <div class="header">
         <div class="header-left">
@@ -4195,6 +4289,221 @@
 
     // Auto-refresh every 60s
     setInterval(() => updateNextBanner(EVENTS), 60000);
+
+    // ========================================
+    // Data Refresh Functions
+    // ========================================
+    let dataRefreshInterval = null;
+    const DATA_REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes
+
+    // Show refresh toast notification
+    function showRefreshToast(text, isSuccess = false) {
+        const toast = document.getElementById('refreshToast');
+        const textEl = document.getElementById('refreshToastText');
+        const spinner = toast.querySelector('.spinner');
+
+        textEl.textContent = text;
+        toast.classList.remove('success');
+
+        if (isSuccess) {
+            toast.classList.add('success');
+            spinner.style.display = 'none';
+        } else {
+            spinner.style.display = 'block';
+        }
+
+        toast.classList.add('show');
+
+        // Auto-hide after showing
+        setTimeout(() => {
+            toast.classList.remove('show');
+            spinner.style.display = 'block';
+        }, isSuccess ? 1500 : 10000);
+    }
+
+    // Refresh Spot tab data (keep map position)
+    async function refreshSpotData() {
+        console.log('🔄 [Refresh] Spot data refresh started...');
+        try {
+            await fetchScoreRealData();
+            if (scoreMap) {
+                renderScoreMap();
+            }
+            console.log('✅ [Refresh] Spot data refreshed');
+            return true;
+        } catch (e) {
+            console.error('❌ [Refresh] Spot refresh error:', e);
+            return false;
+        }
+    }
+
+    // Refresh Navi tab data (keep map position)
+    async function refreshNaviData() {
+        console.log('🔄 [Refresh] Navi data refresh started...');
+        try {
+            await fetchNaviEvents();
+            if (longMap) {
+                renderNaviMap();
+                renderNaviList();
+                updateNaviRecommend();
+            }
+            console.log('✅ [Refresh] Navi data refreshed');
+            return true;
+        } catch (e) {
+            console.error('❌ [Refresh] Navi refresh error:', e);
+            return false;
+        }
+    }
+
+    // Combined refresh for both tabs
+    async function refreshAllData(showToast = true) {
+        if (showToast) showRefreshToast('🔄 更新中...');
+
+        const results = await Promise.all([
+            refreshSpotData(),
+            refreshNaviData()
+        ]);
+
+        const success = results.every(r => r);
+
+        if (showToast) {
+            setTimeout(() => {
+                showRefreshToast(success ? '✅ 更新完了' : '⚠️ 一部更新失敗', success);
+            }, 300);
+        }
+
+        return success;
+    }
+
+    // Start auto-refresh interval (15 minutes)
+    function startDataRefreshInterval() {
+        if (dataRefreshInterval) clearInterval(dataRefreshInterval);
+        dataRefreshInterval = setInterval(() => {
+            const appsActive = document.getElementById('apps-content')?.classList.contains('active');
+            const longActive = document.getElementById('long-content')?.classList.contains('active');
+
+            // Only refresh if on relevant tab, show toast
+            if (appsActive || longActive) {
+                console.log('🕐 [Auto-Refresh] 15-minute interval triggered');
+                refreshAllData(true);
+            }
+        }, DATA_REFRESH_INTERVAL);
+        console.log('✅ [Auto-Refresh] Interval started (15 min)');
+    }
+
+    // ========================================
+    // Pull-to-Refresh for Lists
+    // ========================================
+    function initPullToRefresh() {
+        // Spot tab - score sidebar list
+        const scoreSidebar = document.querySelector('.score-sidebar');
+        const scoreSbList = document.getElementById('scoreSbList');
+
+        // Navi tab - navi sheet
+        const naviSheet = document.getElementById('navi-sheet');
+
+        // Setup for each pullable area
+        if (scoreSidebar && scoreSbList) {
+            setupPullToRefresh(scoreSidebar, scoreSbList, 'spot');
+        }
+        if (naviSheet) {
+            setupPullToRefresh(naviSheet, naviSheet, 'navi');
+        }
+    }
+
+    function setupPullToRefresh(container, scrollableEl, tabType) {
+        let startY = 0;
+        let currentY = 0;
+        let pulling = false;
+        let indicator = null;
+
+        // Create indicator
+        indicator = document.createElement('div');
+        indicator.className = 'pull-indicator';
+        indicator.innerHTML = '<span class="pull-arrow">↓</span>';
+        container.style.position = 'relative';
+        container.insertBefore(indicator, container.firstChild);
+
+        const onTouchStart = (e) => {
+            // Only start if scrolled to top
+            const scrollTop = scrollableEl.scrollTop || 0;
+            if (scrollTop > 5) return;
+
+            startY = e.touches[0].clientY;
+            pulling = true;
+        };
+
+        const onTouchMove = (e) => {
+            if (!pulling) return;
+
+            currentY = e.touches[0].clientY;
+            const deltaY = currentY - startY;
+
+            // Only trigger on downward pull
+            if (deltaY < 0) {
+                pulling = false;
+                indicator.classList.remove('visible', 'ready');
+                return;
+            }
+
+            // Show indicator
+            if (deltaY > 10) {
+                e.preventDefault();
+                indicator.classList.add('visible');
+
+                // Calculate pull progress (max 80px)
+                const progress = Math.min(deltaY / 80, 1);
+                indicator.style.top = (-50 + deltaY * 0.5) + 'px';
+
+                // Ready state when pulled enough
+                if (deltaY > 60) {
+                    indicator.classList.add('ready');
+                } else {
+                    indicator.classList.remove('ready');
+                }
+            }
+        };
+
+        const onTouchEnd = async (e) => {
+            if (!pulling) return;
+
+            const deltaY = currentY - startY;
+            pulling = false;
+
+            // Trigger refresh if pulled enough
+            if (deltaY > 60) {
+                indicator.classList.add('refreshing');
+
+                // Refresh based on tab type
+                if (tabType === 'spot') {
+                    await refreshSpotData();
+                } else if (tabType === 'navi') {
+                    await refreshNaviData();
+                }
+
+                showRefreshToast('✅ 更新完了', true);
+            }
+
+            // Reset indicator
+            setTimeout(() => {
+                indicator.classList.remove('visible', 'ready', 'refreshing');
+                indicator.style.top = '-50px';
+            }, 200);
+        };
+
+        // Add passive: false to allow preventDefault
+        container.addEventListener('touchstart', onTouchStart, { passive: true });
+        container.addEventListener('touchmove', onTouchMove, { passive: false });
+        container.addEventListener('touchend', onTouchEnd, { passive: true });
+    }
+
+    // Initialize refresh features
+    startDataRefreshInterval();
+
+    // Init pull-to-refresh after DOM is ready
+    setTimeout(() => {
+        initPullToRefresh();
+    }, 1000);
 
     // Unregister any existing Service Workers
     if ('serviceWorker' in navigator) {
