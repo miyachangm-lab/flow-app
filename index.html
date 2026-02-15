@@ -1704,12 +1704,19 @@
         'COOL JAPAN PARK OSAKA': { lat: 34.6850, lng: 135.5340 },
     };
 
-    // Yahoo!カーナビ起動（フォールバック: Google Maps）
+    // Yahoo!カーナビ起動（ユニバーサルリンク優先、フォールバック: Google Maps）
     function openYahooNavi(lat, lng, name) {
-        const url = 'yjcarnavi://navi/select?lat=' + lat + '&lon=' + lng + '&name=' + encodeURIComponent(name || '');
+        const encodedName = encodeURIComponent(name || '');
+        // ユニバーサルリンク（アプリがあれば開く、なければブラウザで開く）
+        const yahooUrl = 'https://carnavi.yahoo.co.jp/navi/select?lat=' + lat + '&lon=' + lng + '&name=' + encodedName;
         const fallback = 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '&travelmode=driving';
-        setTimeout(function() { window.location = fallback; }, 1500);
-        window.location = url;
+
+        // Yahoo!カーナビを試行、失敗時はGoogle Mapsにフォールバック
+        const win = window.open(yahooUrl, '_blank');
+        if (!win || win.closed || typeof win.closed === 'undefined') {
+            // ポップアップブロック時はGoogle Mapsで開く
+            window.location.href = fallback;
+        }
     }
 
     function openNavi(venue) {
@@ -2429,10 +2436,7 @@
         );
     };
     window.scoreNavi = function(lat, lng, name) {
-        var url = 'yjcarnavi://navi/select?lat=' + lat + '&lon=' + lng + '&name=' + encodeURIComponent(name);
-        var fallback = 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '&travelmode=driving';
-        var timer = setTimeout(function() { window.location = fallback; }, 1500);
-        window.location = url;
+        openYahooNavi(lat, lng, name);
     };
 
     // ========================================
