@@ -1704,18 +1704,33 @@
         'COOL JAPAN PARK OSAKA': { lat: 34.6850, lng: 135.5340 },
     };
 
-    // Yahoo!カーナビ起動（ユニバーサルリンク優先、フォールバック: Google Maps）
+    // ナビアプリ選択ダイアログ（Googleマップ or Apple標準マップ）
     function openYahooNavi(lat, lng, name) {
-        const encodedName = encodeURIComponent(name || '');
-        // ユニバーサルリンク（アプリがあれば開く、なければブラウザで開く）
-        const yahooUrl = 'https://carnavi.yahoo.co.jp/navi/select?lat=' + lat + '&lon=' + lng + '&name=' + encodedName;
-        const fallback = 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '&travelmode=driving';
+        const useGoogle = confirm('Googleマップで開きますか？\n\n[OK] → Googleマップ\n[キャンセル] → Apple標準マップ');
 
-        // Yahoo!カーナビを試行、失敗時はGoogle Mapsにフォールバック
-        const win = window.open(yahooUrl, '_blank');
-        if (!win || win.closed || typeof win.closed === 'undefined') {
-            // ポップアップブロック時はGoogle Mapsで開く
-            window.location.href = fallback;
+        if (useGoogle) {
+            // Googleマップアプリを試行、なければWeb版にフォールバック
+            const googleAppUrl = 'comgooglemaps://?daddr=' + lat + ',' + lng + '&directionsmode=driving';
+            const googleWebUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '&travelmode=driving';
+
+            // アプリを試行、1.5秒後にWeb版にフォールバック
+            let opened = false;
+            window.location.href = googleAppUrl;
+            setTimeout(function() {
+                if (!opened && !document.hidden) {
+                    window.location.href = googleWebUrl;
+                }
+            }, 1500);
+            document.addEventListener('visibilitychange', function handler() {
+                if (document.hidden) {
+                    opened = true;
+                    document.removeEventListener('visibilitychange', handler);
+                }
+            });
+        } else {
+            // Apple標準マップ
+            const appleUrl = 'maps://maps.apple.com/?daddr=' + lat + ',' + lng + '&dirflg=d';
+            window.location.href = appleUrl;
         }
     }
 
