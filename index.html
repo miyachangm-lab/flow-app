@@ -2079,18 +2079,33 @@
 
     // ridesテーブルから実績データを取得
     async function fetchScoreRealData() {
-        if (!sb) return;
+        console.log('🔄 [rides連携] fetchScoreRealData開始...');
+        if (!sb) {
+            console.warn('❌ [rides連携] Supabaseクライアントが未初期化');
+            return;
+        }
         try {
+            console.log('📡 [rides連携] ridesテーブルからデータ取得中...');
             const { data: rides, error } = await sb.from('rides').select('fare, ride_at, pickup');
-            if (error || !rides) {
-                console.warn('rides取得エラー:', error);
+            if (error) {
+                console.error('❌ [rides連携] クエリエラー:', error);
                 return;
             }
+            if (!rides || rides.length === 0) {
+                console.warn('⚠️ [rides連携] ridesテーブルにデータなし');
+                return;
+            }
+            console.log('📊 [rides連携] 取得件数:', rides.length, '件');
 
+            // マッピングできなかったpickup名を記録
+            const unmapped = new Set();
             const stats = {};
             rides.forEach(r => {
                 const id = pickupToScorePointId(r.pickup);
-                if (!id) return;
+                if (!id) {
+                    if (r.pickup) unmapped.add(r.pickup);
+                    return;
+                }
 
                 if (!stats[id]) stats[id] = { rides: 0, totalFare: 0, hours: {} };
                 stats[id].rides++;
@@ -2106,12 +2121,21 @@
             });
 
             scoreRealData = stats;
-            console.log('✅ rides実績:', Object.keys(stats).length + 'エリア', stats);
+            console.log('✅ [rides連携] マッピング成功:', Object.keys(stats).length, 'エリア');
+            console.table(Object.entries(stats).map(([id, s]) => ({
+                エリアID: id,
+                乗車数: s.rides,
+                平均運賃: '¥' + s.fare.toLocaleString(),
+                時間帯: Object.keys(s.hours).join(',') + '時'
+            })));
+            if (unmapped.size > 0) {
+                console.warn('⚠️ [rides連携] マッピングできなかったpickup名:', Array.from(unmapped));
+            }
 
             // スコア再計算
             if (scoreMap) renderScoreMap();
         } catch (err) {
-            console.error('rides取得エラー:', err);
+            console.error('❌ [rides連携] 例外発生:', err);
         }
     }
 
@@ -2382,6 +2406,33 @@
     window.scoreStepTime = function(dir) { scoreHour = Math.max(0, Math.min(23, Math.round(scoreHour) + dir)); document.getElementById('scoreTimeVal').textContent = String(scoreHour).padStart(2, '0') + ':00'; renderScoreMap(); };
     window.scoreSetDay = function(d) { scoreDay = d; document.querySelectorAll('.score-pb[data-d]').forEach(b => b.className = b.dataset.d === d ? 'score-pb d-on' : 'score-pb'); renderScoreMap(); };
     window.scoreSetMode = function(m) { scoreMode = m; document.getElementById('scoreModeAnaba').className = m === 'anaba' ? 'score-pb m-gem' : 'score-pb'; document.getElementById('scoreModeStd').className = m === 'std' ? 'score-pb m-std' : 'score-pb'; renderScoreMap(); };
+
+    // デバッグ用: rides連携の状態を確認
+    window.debugRidesData = function() {
+        console.log('========== 🔍 rides連携デバッグ ==========');
+        console.log('📦 scoreRealData (ridesテーブルから取得したデータ):');
+        if (Object.keys(scoreRealData).length === 0) {
+            console.warn('⚠️ scoreRealDataは空です。ridesテーブルからのデータ取得に失敗している可能性があります。');
+        } else {
+            console.table(Object.entries(scoreRealData).map(([id, s]) => ({
+                エリアID: id,
+                乗車数: s.rides,
+                平均運賃: '¥' + s.fare.toLocaleString(),
+                時間帯: Object.keys(s.hours).join(',') + '時'
+            })));
+        }
+        console.log('\n📊 各エリアのスコア計算（rides実績反映状況）:');
+        const hh = Math.floor(scoreHour) % 24;
+        SCORE_POINTS.forEach(p => {
+            const dbReal = scoreRealData[p.id];
+            const s = scoreCalc(p);
+            const source = dbReal ? '🔄 ridesテーブル' : (p.real && p.real.rides > 0 ? '📝 ハードコード' : '❌ なし');
+            console.log(p.name + ' [' + p.id + ']: スコア=' + s.total + ', 実績スコア=' + s.rl + ', 実績ラベル="' + s.rL + '", データソース=' + source);
+        });
+        console.log('==========================================');
+    };
+    console.log('💡 デバッグ: コンソールで debugRidesData() を実行するとrides連携の状態を確認できます');
+
     window.scoreGoGPS = function() {
         if (!navigator.geolocation) return;
         navigator.geolocation.getCurrentPosition(
