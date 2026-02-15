@@ -456,18 +456,6 @@
         .score-pb.m-gem { background: rgba(52,211,153,0.2); color: #34d399; font-weight: 700; }
         .score-pb.m-std { background: rgba(34,211,238,0.2); color: #22d3ee; font-weight: 700; }
 
-        /* Direction hint */
-        .score-dir-hint {
-            position: absolute; bottom: 14px; left: 14px; z-index: 800;
-            background: rgba(15,23,42,0.92); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px; padding: 10px 14px; display: none; backdrop-filter: blur(8px);
-        }
-        .score-dir-hint.show { display: flex; align-items: center; gap: 10px; }
-        .score-dir-arrow { font-size: 1.8em; line-height: 1; }
-        .score-dir-text { font-size: 0.78em; line-height: 1.4; }
-        .score-dir-text .area { font-weight: 700; color: #34d399; }
-        .score-dir-text .dist { font-family: 'JetBrains Mono', monospace; color: #22d3ee; }
-
         /* Map pins */
         .score-pin {
             position: relative; display: flex; align-items: center; justify-content: center;
@@ -554,19 +542,6 @@
         }
         .score-location-btn:active { transform: scale(0.95); background: rgba(0,230,118,0.15); }
         .score-location-btn svg { width: 22px; height: 22px; }
-
-        /* Direction hint (bottom-left, above GPS button) */
-        .score-dir-hint {
-            position: absolute; bottom: 75px; left: 16px; z-index: 800;
-            background: rgba(15,23,42,0.92); border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 12px; padding: 10px 14px; display: none; backdrop-filter: blur(8px);
-            align-items: center; gap: 10px; min-width: 160px;
-        }
-        .score-dir-hint.show { display: flex; }
-        .score-dir-arrow { font-size: 1.6em; line-height: 1; color: #22d3ee; }
-        .score-dir-text { font-size: 0.8em; line-height: 1.4; display: flex; flex-direction: column; gap: 2px; }
-        .score-dir-text .area { font-weight: 700; color: #34d399; font-size: 1.1em; }
-        .score-dir-text .dist { font-family: 'JetBrains Mono', monospace; color: #22d3ee; font-size: 0.9em; }
 
         /* Distance badge in sidebar */
         .score-li .dst { font-size: 0.65em; color: var(--gray-500); margin-left: 4px; }
@@ -1350,14 +1325,6 @@
                         <line x1="18" y1="12" x2="22" y2="12"/>
                     </svg>
                 </button>
-                <!-- Direction hint (bottom-left, above GPS button) -->
-                <div class="score-dir-hint" id="scoreDirHint">
-                    <div class="score-dir-arrow" id="scoreDirArrow">↗</div>
-                    <div class="score-dir-text">
-                        <span class="area" id="scoreDirArea">--</span>
-                        <span class="dist" id="scoreDirDist">--</span>
-                    </div>
-                </div>
             </div>
             <div class="score-sidebar">
                 <div class="score-sb-head">
@@ -2404,28 +2371,10 @@
             }
         });
         document.getElementById('scoreSbList').innerHTML = h;
-        updateScoreDirHint(gems);
     }
 
     function scrollToScoreItem(id) {
         setTimeout(() => { const el = document.querySelector('.score-li.sel'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 50);
-    }
-
-    // 方向ヒント
-    function updateScoreDirHint(gems) {
-        const hint = document.getElementById('scoreDirHint');
-        if (!scoreMyPos || gems.length === 0) { hint.className = 'score-dir-hint'; return; }
-        const top = gems[0];
-        const dlat = (top.lat - scoreMyPos[0]) * 111000;
-        const dlng = (top.lng - scoreMyPos[1]) * 91000;
-        const dist = Math.sqrt(dlat * dlat + dlng * dlng);
-        const angle = Math.atan2(dlng, dlat) * 180 / Math.PI;
-        const arrows = ['↑', '↗', '→', '↘', '↓', '↙', '←', '↖'];
-        const arrow = arrows[Math.round(((angle + 360) % 360) / 45) % 8];
-        document.getElementById('scoreDirArrow').textContent = arrow;
-        document.getElementById('scoreDirArea').textContent = top.name + ' (' + top.s.total + ')';
-        document.getElementById('scoreDirDist').textContent = dist >= 1000 ? (dist / 1000).toFixed(1) + 'km' : Math.round(dist) + 'm';
-        hint.className = 'score-dir-hint show';
     }
 
     // コントロール
