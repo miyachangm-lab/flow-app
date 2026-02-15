@@ -4392,22 +4392,16 @@
     }
 
     // ========================================
-    // Pull-to-Refresh for Lists
+    // Pull-to-Refresh for Spot Tab Only
+    // (Navi tab uses bottom sheet swipe, so pull-to-refresh is disabled there)
     // ========================================
     function initPullToRefresh() {
-        // Spot tab - score sidebar list
+        // Spot tab - score sidebar list only
         const scoreSidebar = document.querySelector('.score-sidebar');
         const scoreSbList = document.getElementById('scoreSbList');
 
-        // Navi tab - navi sheet
-        const naviSheet = document.getElementById('navi-sheet');
-
-        // Setup for each pullable area
         if (scoreSidebar && scoreSbList) {
             setupPullToRefresh(scoreSidebar, scoreSbList, 'spot');
-        }
-        if (naviSheet) {
-            setupPullToRefresh(naviSheet, naviSheet, 'navi');
         }
     }
 
@@ -4417,12 +4411,17 @@
         let pulling = false;
         let indicator = null;
 
-        // Create indicator
+        // Create indicator (append to body to avoid layout issues)
         indicator = document.createElement('div');
         indicator.className = 'pull-indicator';
         indicator.innerHTML = '<span class="pull-arrow">↓</span>';
-        container.style.position = 'relative';
-        container.insertBefore(indicator, container.firstChild);
+
+        // Insert indicator inside the container but don't change container's position
+        const existingPosition = window.getComputedStyle(container).position;
+        if (existingPosition === 'static') {
+            container.style.position = 'relative';
+        }
+        container.appendChild(indicator);
 
         const onTouchStart = (e) => {
             // Only start if scrolled to top
@@ -4453,7 +4452,7 @@
 
                 // Calculate pull progress (max 80px)
                 const progress = Math.min(deltaY / 80, 1);
-                indicator.style.top = (-50 + deltaY * 0.5) + 'px';
+                indicator.style.top = Math.min(deltaY * 0.5, 40) + 'px';
 
                 // Ready state when pulled enough
                 if (deltaY > 60) {
@@ -4474,11 +4473,8 @@
             if (deltaY > 60) {
                 indicator.classList.add('refreshing');
 
-                // Refresh based on tab type
                 if (tabType === 'spot') {
                     await refreshSpotData();
-                } else if (tabType === 'navi') {
-                    await refreshNaviData();
                 }
 
                 showRefreshToast('✅ 更新完了', true);
